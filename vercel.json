@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "app_multiusuario.py",
+      "src": "app_vercel.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "app_multiusuario.py"
+      "dest": "app_vercel.py"
     }
   ],
   "env": {
