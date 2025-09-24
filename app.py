@@ -150,7 +150,7 @@ def reclasificar_niveles_buyin_automatica():
         # Obtener registros de torneos sin clasificar (todos los tipos de movimiento de torneos)
         registros_sin_clasificar = PokerResult.query.filter(
             PokerResult.categoria == 'Torneo',
-            PokerResult.tipo_movimiento.in_(['Bounty', 'Winnings', 'Sit & Crush Jackpot', 'Fee', 'Reentry Fee', 'Reentry Buy In', 'Unregister Buy In', 'Unregister Fee']),
+            PokerResult.tipo_movimiento.in_(['Bounty', 'Winnings', 'Sit & Crush Jackpot', 'Fee', 'Reentry Fee', 'Reentry Buy In', 'Unregister Buy In', 'Unregister Fee', 'Tournament Rebuy']),
             PokerResult.nivel_buyin.is_(None)
         ).all()
         
@@ -204,6 +204,72 @@ def reclasificar_niveles_buyin_automatica():
         
     except Exception as e:
         print(f"Error en reclasificación automática: {e}")
+        return 0
+
+def reclasificar_tipos_juego_automatica():
+    """Reclasifica automáticamente los tipos de juego para registros relacionados (Reentry Buy In, Winnings, Bounty, etc.)"""
+    try:
+        # Obtener todos los registros Buy In con tipo de juego específico
+        buyins_clasificados = PokerResult.query.filter(
+            PokerResult.categoria == 'Torneo',
+            PokerResult.tipo_movimiento == 'Buy In',
+            PokerResult.tipo_juego != 'Torneo'  # Solo los que tienen tipo específico
+        ).all()
+        
+        if not buyins_clasificados:
+            return 0
+        
+        # Crear diccionario de descripción -> tipo_juego para búsqueda rápida
+        descripcion_tipo_juego = {}
+        for buyin in buyins_clasificados:
+            descripcion_tipo_juego[buyin.descripcion] = buyin.tipo_juego
+        
+        # Obtener registros que necesitan reclasificación (solo los que tienen tipo genérico)
+        registros_sin_clasificar = PokerResult.query.filter(
+            PokerResult.categoria == 'Torneo',
+            PokerResult.tipo_movimiento.in_(['Reentry Buy In', 'Winnings', 'Bounty', 'Fee', 'Reentry Fee', 'Unregister Buy In', 'Unregister Fee', 'Sit & Crush Jackpot', 'Tournament Rebuy']),
+            PokerResult.tipo_juego == 'Torneo'  # Solo los que tienen tipo genérico
+        ).all()
+        
+        if not registros_sin_clasificar:
+            return 0
+        
+        reclasificados = 0
+        for registro in registros_sin_clasificar:
+            try:
+                tipo_juego = None
+                
+                # Método 1: Búsqueda exacta por descripción
+                if registro.descripcion in descripcion_tipo_juego:
+                    tipo_juego = descripcion_tipo_juego[registro.descripcion]
+                else:
+                    # Método 2: Búsqueda por ID del torneo (primeros números)
+                    partes = registro.descripcion.split(' ', 1)
+                    if len(partes) > 1:
+                        torneo_id = partes[0]
+                        
+                        # Buscar Buy In que comience con el mismo ID
+                        for buyin_desc, tipo in descripcion_tipo_juego.items():
+                            if buyin_desc.startswith(torneo_id + ' '):
+                                tipo_juego = tipo
+                                break
+                
+                if tipo_juego:
+                    registro.tipo_juego = tipo_juego
+                    reclasificados += 1
+                    print(f"✅ Reclasificado: {registro.tipo_movimiento} -> {tipo_juego}")
+                    
+            except Exception as e:
+                print(f"Error reclasificando tipo de juego para registro {registro.id}: {e}")
+                continue
+        
+        if reclasificados > 0:
+            db.session.commit()
+        
+        return reclasificados
+        
+    except Exception as e:
+        print(f"Error en reclasificación de tipos de juego: {e}")
         return 0
 
 # Función para procesar archivos de WPN
@@ -324,6 +390,14 @@ def procesar_archivo_wpn(filepath):
             print(f"Registros reclasificados automáticamente: {reclasificados}")
         except Exception as e:
             print(f"Error en reclasificación automática: {e}")
+        
+        # Ejecutar reclasificación automática de tipos de juego
+        print(f"\n=== RECLASIFICACIÓN AUTOMÁTICA DE TIPOS DE JUEGO ===")
+        try:
+            tipos_reclasificados = reclasificar_tipos_juego_automatica()
+            print(f"Tipos de juego reclasificados automáticamente: {tipos_reclasificados}")
+        except Exception as e:
+            print(f"Error en reclasificación de tipos de juego: {e}")
         
         return resultados_importados, duplicados_encontrados, duplicados_detalle
         
@@ -468,6 +542,14 @@ def procesar_archivo_pokerstars(filepath):
         except Exception as e:
             print(f"Error en reclasificación automática: {e}")
         
+        # Ejecutar reclasificación automática de tipos de juego
+        print(f"\n=== RECLASIFICACIÓN AUTOMÁTICA DE TIPOS DE JUEGO ===")
+        try:
+            tipos_reclasificados = reclasificar_tipos_juego_automatica()
+            print(f"Tipos de juego reclasificados automáticamente: {tipos_reclasificados}")
+        except Exception as e:
+            print(f"Error en reclasificación de tipos de juego: {e}")
+        
         return resultados_importados, duplicados_encontrados, duplicados_detalle
         
     except Exception as e:
@@ -482,9 +564,11 @@ def categorizar_movimiento_pokerstars(action, game, tournament_id):
     game_lower = game.lower() if game else ''
     
     # Determinar categoría
-    if 'tournament' in action_lower:
+    if 'tournament' in action_lower or 'bounty' in action_lower:
         categoria = 'Torneo'
-    elif 'cash' in action_lower:
+    elif 'chest reward' in action_lower:
+        categoria = 'Bonus'
+    elif 'cash' in action_lower or 'table buy in' in action_lower or 'table rebuy' in action_lower or 'leave table' in action_lower or 'table buy in (zoom)' in action_lower or 'leave table (zoom)' in action_lower:
         categoria = 'Cash'
     elif 'transfer' in action_lower:
         categoria = 'Transferencia'
@@ -513,19 +597,31 @@ def categorizar_movimiento_pokerstars(action, game, tournament_id):
     else:
         tipo_movimiento = action
     
-    # Determinar tipo de juego
-    if 'plo' in game_lower or 'omaha' in game_lower:
-        if 'hi/lo' in game_lower or 'hi lo' in game_lower:
-            tipo_juego = 'PLO Hi/Lo'
-        elif '8' in game_lower:
-            tipo_juego = 'PLO8'
+    # Determinar tipo de juego - priorizar información de la columna Game
+    if game and game.strip():
+        # Si hay información en la columna Game, usarla para determinar el tipo
+        # Detectar Courchevel ANTES que PLO genérico
+        if 'courchevel' in game_lower:
+            tipo_juego = 'PL Courchevel Hi/Lo'
+        elif 'plo' in game_lower or 'omaha' in game_lower:
+            if 'hi/lo' in game_lower or 'hi lo' in game_lower:
+                tipo_juego = 'PLO Hi/Lo'
+            elif '8' in game_lower:
+                tipo_juego = 'PLO8'
+            else:
+                tipo_juego = 'PLO'
+        elif 'holdem' in game_lower or 'nlh' in game_lower or 'nl hold' in game_lower:
+            tipo_juego = 'NLH'
+        elif 'stud' in game_lower:
+            tipo_juego = 'Stud'
         else:
-            tipo_juego = 'PLO'
-    elif 'holdem' in game_lower or 'nlh' in game_lower:
-        tipo_juego = 'NLH'
-    elif 'stud' in game_lower:
-        tipo_juego = 'Stud'
-    elif 'tournament' in action_lower:
+            # Si hay información en Game pero no coincide con patrones conocidos
+            if 'tournament' in action_lower or 'bounty' in action_lower:
+                tipo_juego = 'Torneo'
+            else:
+                tipo_juego = 'Cash'
+    elif 'tournament' in action_lower or 'bounty' in action_lower:
+        # Si no hay información en Game pero es un torneo, usar 'Torneo'
         tipo_juego = 'Torneo'
     else:
         tipo_juego = 'Cash'
@@ -770,6 +866,9 @@ def api_analisis_insights():
         # Análisis por nivel de buy-in
         analisis_buyin = analizar_rendimiento_por_buyin(torneos)
         
+        # Análisis por sala
+        analisis_sala = analizar_rendimiento_por_sala(torneos)
+        
         # Análisis temporal
         analisis_temporal = analizar_patrones_temporales(torneos)
         
@@ -784,6 +883,7 @@ def api_analisis_insights():
         
         return jsonify({
             'analisis_buyin': analisis_buyin,
+            'analisis_sala': analisis_sala,
             'analisis_temporal': analisis_temporal,
             'analisis_juego': analisis_juego,
             'analisis_consistencia': analisis_consistencia,
@@ -807,12 +907,14 @@ def analizar_rendimiento_por_buyin(torneos):
                     'roi': 0,
                     'mejor_racha': 0,
                     'peor_racha': 0,
-                    'racha_actual': 0
+                    'racha_actual': 0,
+                    'salas': set()  # Agregar información de salas
                 }
             
             buyin_stats[torneo.nivel_buyin]['total_torneos'] += 1
             buyin_stats[torneo.nivel_buyin]['total_invertido'] += abs(torneo.importe) if torneo.importe < 0 else 0
             buyin_stats[torneo.nivel_buyin]['total_ganancias'] += torneo.importe if torneo.importe > 0 else 0
+            buyin_stats[torneo.nivel_buyin]['salas'].add(torneo.sala)
     
     # Calcular ROI y rachas
     for nivel, stats in buyin_stats.items():
@@ -822,8 +924,55 @@ def analizar_rendimiento_por_buyin(torneos):
         # Calcular rachas (simplificado)
         stats['mejor_racha'] = max(0, stats['total_ganancias'] / stats['total_invertido'] if stats['total_invertido'] > 0 else 0)
         stats['peor_racha'] = min(0, (stats['total_ganancias'] - stats['total_invertido']) / stats['total_invertido'] if stats['total_invertido'] > 0 else 0)
+        
+        # Convertir set a lista para JSON
+        stats['salas'] = list(stats['salas'])
     
     return buyin_stats
+
+def analizar_rendimiento_por_sala(torneos):
+    """Analiza el rendimiento por sala"""
+    sala_stats = {}
+    
+    for torneo in torneos:
+        if torneo.sala:
+            if torneo.sala not in sala_stats:
+                sala_stats[torneo.sala] = {
+                    'total_torneos': 0,
+                    'total_invertido': 0,
+                    'total_ganancias': 0,
+                    'roi': 0,
+                    'torneos_ganados': 0,
+                    'tipos_juego': set(),
+                    'niveles_buyin': set()
+                }
+            
+            sala_stats[torneo.sala]['total_torneos'] += 1
+            sala_stats[torneo.sala]['total_invertido'] += abs(torneo.importe) if torneo.importe < 0 else 0
+            sala_stats[torneo.sala]['total_ganancias'] += torneo.importe if torneo.importe > 0 else 0
+            
+            if torneo.importe > 0:
+                sala_stats[torneo.sala]['torneos_ganados'] += 1
+            
+            if torneo.tipo_juego:
+                sala_stats[torneo.sala]['tipos_juego'].add(torneo.tipo_juego)
+            
+            if torneo.nivel_buyin:
+                sala_stats[torneo.sala]['niveles_buyin'].add(torneo.nivel_buyin)
+    
+    # Calcular ROI y porcentaje de victorias
+    for sala, stats in sala_stats.items():
+        if stats['total_invertido'] > 0:
+            stats['roi'] = ((stats['total_ganancias'] - stats['total_invertido']) / stats['total_invertido']) * 100
+        
+        if stats['total_torneos'] > 0:
+            stats['porcentaje_victorias'] = (stats['torneos_ganados'] / stats['total_torneos']) * 100
+        
+        # Convertir sets a listas para JSON
+        stats['tipos_juego'] = list(stats['tipos_juego'])
+        stats['niveles_buyin'] = list(stats['niveles_buyin'])
+    
+    return sala_stats
 
 def analizar_patrones_temporales(torneos):
     """Analiza patrones temporales de juego"""

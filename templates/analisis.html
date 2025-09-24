@@ -90,15 +90,59 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Tipo de Juego</th>
+                                        <th class="sortable-analisis" data-column="juego" style="cursor: pointer;">
+                                            Tipo de Juego <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable-analisis" data-column="torneos" style="cursor: pointer;">
+                                            Torneos <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable-analisis" data-column="victorias" style="cursor: pointer;">
+                                            Victorias <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable-analisis" data-column="porcentaje_victorias" style="cursor: pointer;">
+                                            % Victorias <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable-analisis" data-column="roi" style="cursor: pointer;">
+                                            ROI <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable-analisis" data-column="resultado_neto" style="cursor: pointer;">
+                                            Resultado Neto <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-juego">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis por Sala -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-building me-2"></i>Rendimiento por Sala</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sala</th>
                                         <th>Torneos</th>
                                         <th>Victorias</th>
                                         <th>% Victorias</th>
                                         <th>ROI</th>
                                         <th>Resultado Neto</th>
+                                        <th>Tipos de Juego</th>
+                                        <th>Niveles</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabla-juego">
+                                <tbody id="tabla-sala">
                                     <!-- Se llenará dinámicamente -->
                                 </tbody>
                             </table>
@@ -181,6 +225,128 @@
 let graficoDiasSemana = null;
 let graficoHoras = null;
 
+// Variables globales para ordenamiento de análisis
+let datosAnalisisJuego = [];
+let ordenAnalisisActual = { columna: null, direccion: 'asc' };
+
+// Función para ordenar datos de análisis
+function ordenarDatosAnalisis(columna, direccion) {
+    datosAnalisisJuego.sort((a, b) => {
+        const [juegoA, statsA] = a;
+        const [juegoB, statsB] = b;
+        
+        let valorA, valorB;
+        
+        // Obtener el valor correcto según la columna
+        switch(columna) {
+            case 'juego':
+                valorA = juegoA;
+                valorB = juegoB;
+                break;
+            case 'torneos':
+                valorA = statsA.total_torneos;
+                valorB = statsB.total_torneos;
+                break;
+            case 'victorias':
+                valorA = statsA.torneos_ganados;
+                valorB = statsB.torneos_ganados;
+                break;
+            case 'porcentaje_victorias':
+                valorA = statsA.porcentaje_victorias || 0;
+                valorB = statsB.porcentaje_victorias || 0;
+                break;
+            case 'roi':
+                valorA = statsA.roi;
+                valorB = statsB.roi;
+                break;
+            case 'resultado_neto':
+                valorA = statsA.total_ganancias - statsA.total_invertido;
+                valorB = statsB.total_ganancias - statsB.total_invertido;
+                break;
+            default:
+                valorA = '';
+                valorB = '';
+        }
+        
+        // Manejar valores nulos o undefined
+        if (valorA === null || valorA === undefined) valorA = '';
+        if (valorB === null || valorB === undefined) valorB = '';
+        
+        // Ordenamiento especial para números
+        if (columna === 'torneos' || columna === 'victorias' || columna === 'porcentaje_victorias' || columna === 'roi' || columna === 'resultado_neto') {
+            valorA = parseFloat(valorA) || 0;
+            valorB = parseFloat(valorB) || 0;
+        } else {
+            // Ordenamiento alfabético para texto
+            valorA = String(valorA).toLowerCase();
+            valorB = String(valorB).toLowerCase();
+        }
+        
+        if (direccion === 'asc') {
+            return valorA < valorB ? -1 : valorA > valorB ? 1 : 0;
+        } else {
+            return valorA > valorB ? -1 : valorA < valorB ? 1 : 0;
+        }
+    });
+    
+    // Actualizar la tabla con los datos ordenados
+    actualizarTablaAnalisisJuego();
+}
+
+// Función para actualizar la tabla de análisis de juego
+function actualizarTablaAnalisisJuego() {
+    const tbody = document.querySelector('#tabla-juego');
+    tbody.innerHTML = '';
+    
+    datosAnalisisJuego.forEach(([juego, stats]) => {
+        const resultadoNeto = stats.total_ganancias - stats.total_invertido;
+        const colorROI = stats.roi >= 0 ? 'text-success' : 'text-danger';
+        const colorResultado = resultadoNeto >= 0 ? 'text-success' : 'text-danger';
+        const colorVictorias = stats.porcentaje_victorias >= 20 ? 'text-success' : 
+                              stats.porcentaje_victorias >= 10 ? 'text-warning' : 'text-danger';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${juego}</td>
+            <td>${stats.total_torneos}</td>
+            <td>${stats.torneos_ganados}</td>
+            <td class="${colorVictorias}">${stats.porcentaje_victorias ? stats.porcentaje_victorias.toFixed(1) : 0}%</td>
+            <td class="${colorROI}">${stats.roi.toFixed(1)}%</td>
+            <td class="${colorResultado}">$${resultadoNeto.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Función para manejar el clic en los headers de análisis
+function manejarOrdenamientoAnalisis(columna) {
+    // Determinar la dirección del ordenamiento
+    let direccion = 'asc';
+    if (ordenAnalisisActual.columna === columna && ordenAnalisisActual.direccion === 'asc') {
+        direccion = 'desc';
+    }
+    
+    // Actualizar el estado del ordenamiento
+    ordenAnalisisActual.columna = columna;
+    ordenAnalisisActual.direccion = direccion;
+    
+    // Actualizar los iconos de ordenamiento
+    document.querySelectorAll('.sortable-analisis i').forEach(icon => {
+        icon.className = 'fas fa-sort ms-1';
+    });
+    
+    // Actualizar el icono de la columna actual
+    const headerActual = document.querySelector(`[data-column="${columna}"] i`);
+    if (direccion === 'asc') {
+        headerActual.className = 'fas fa-sort-up ms-1 text-primary';
+    } else {
+        headerActual.className = 'fas fa-sort-down ms-1 text-primary';
+    }
+    
+    // Ordenar los datos
+    ordenarDatosAnalisis(columna, direccion);
+}
+
 // Cargar análisis al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
     cargarAnalisis();
@@ -206,6 +372,7 @@ function cargarAnalisis() {
             // Procesar datos
             mostrarRecomendaciones(data.recomendaciones);
             mostrarAnalisisBuyin(data.analisis_buyin);
+            mostrarAnalisisSala(data.analisis_sala);
             mostrarAnalisisJuego(data.analisis_juego);
             mostrarAnalisisConsistencia(data.analisis_consistencia);
             generarGraficos(data.analisis_temporal);
@@ -270,26 +437,56 @@ function mostrarAnalisisBuyin(analisis) {
     });
 }
 
-function mostrarAnalisisJuego(analisis) {
-    const tbody = document.getElementById('tabla-juego');
+function mostrarAnalisisSala(analisis) {
+    const tbody = document.getElementById('tabla-sala');
     tbody.innerHTML = '';
     
-    Object.entries(analisis).forEach(([juego, stats]) => {
+    Object.entries(analisis).forEach(([sala, stats]) => {
         const resultadoNeto = stats.total_ganancias - stats.total_invertido;
         const colorROI = stats.roi >= 0 ? 'text-success' : 'text-danger';
         const colorResultado = resultadoNeto >= 0 ? 'text-success' : 'text-danger';
+        const colorVictorias = stats.porcentaje_victorias >= 20 ? 'text-success' : 
+                              stats.porcentaje_victorias >= 10 ? 'text-warning' : 'text-danger';
         
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${juego}</td>
+            <td><span class="badge bg-info">${sala}</span></td>
             <td>${stats.total_torneos}</td>
             <td>${stats.torneos_ganados}</td>
-            <td>${stats.porcentaje_victorias.toFixed(1)}%</td>
+            <td class="${colorVictorias}">${stats.porcentaje_victorias ? stats.porcentaje_victorias.toFixed(1) : 0}%</td>
             <td class="${colorROI}">${stats.roi.toFixed(1)}%</td>
             <td class="${colorResultado}">$${resultadoNeto.toFixed(2)}</td>
+            <td><small>${stats.tipos_juego.join(', ')}</small></td>
+            <td><small>${stats.niveles_buyin.join(', ')}</small></td>
         `;
         tbody.appendChild(row);
     });
+}
+
+function mostrarAnalisisJuego(analisis) {
+    // Almacenar datos globalmente para ordenamiento
+    datosAnalisisJuego = Object.entries(analisis);
+    
+    // Actualizar tabla usando la función de ordenamiento
+    actualizarTablaAnalisisJuego();
+    
+    // Remover event listeners existentes para evitar duplicados
+    document.querySelectorAll('.sortable-analisis').forEach(header => {
+        header.removeEventListener('click', manejarClickOrdenamiento);
+    });
+    
+    // Agregar event listeners después de cargar los datos
+    setTimeout(() => {
+        document.querySelectorAll('.sortable-analisis').forEach(header => {
+            header.addEventListener('click', manejarClickOrdenamiento);
+        });
+    }, 100);
+}
+
+// Función separada para manejar el click de ordenamiento
+function manejarClickOrdenamiento() {
+    const columna = this.getAttribute('data-column');
+    manejarOrdenamientoAnalisis(columna);
 }
 
 function mostrarAnalisisConsistencia(analisis) {
