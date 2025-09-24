@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis Avanzado - Poker Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-chart-line me-2"></i>Análisis Avanzado</h1>
+                <button class="btn btn-primary" onclick="cargarAnalisis()">
+                    <i class="fas fa-sync-alt me-2"></i>Actualizar Análisis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="text-center" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Analizando datos...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="alert alert-danger" style="display: none;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span id="error-text"></span>
+    </div>
+
+    <!-- Análisis Content -->
+    <div id="analisis-content" style="display: none;">
+        
+        <!-- Recomendaciones -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Recomendaciones Estratégicas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recomendaciones-container">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis por Nivel de Buy-in -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Rendimiento por Nivel de Buy-in</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nivel</th>
+                                        <th>Torneos</th>
+                                        <th>Invertido</th>
+                                        <th>Ganancias</th>
+                                        <th>ROI</th>
+                                        <th>Resultado Neto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-buyin">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis por Tipo de Juego -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-dice me-2"></i>Rendimiento por Tipo de Juego</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Juego</th>
+                                        <th>Torneos</th>
+                                        <th>Victorias</th>
+                                        <th>% Victorias</th>
+                                        <th>ROI</th>
+                                        <th>Resultado Neto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-juego">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis Temporal -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calendar-week me-2"></i>Rendimiento por Día de la Semana</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoDiasSemana" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Rendimiento por Hora</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoHoras" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis de Consistencia -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Análisis de Consistencia</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 text-center">
+                                <h4 class="text-primary" id="dias-jugados">0</h4>
+                                <small class="text-muted">Días Jugados</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <h4 class="text-success" id="dias-positivos">0</h4>
+                                <small class="text-muted">Días Positivos</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <h4 class="text-danger" id="dias-negativos">0</h4>
+                                <small class="text-muted">Días Negativos</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <h4 class="text-info" id="consistencia-nivel">-</h4>
+                                <small class="text-muted">Nivel de Consistencia</small>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6>Resultado Promedio Diario</h6>
+                                <p class="mb-0" id="resultado-promedio">$0.00</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Coeficiente de Variación</h6>
+                                <p class="mb-0" id="coeficiente-variacion">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let graficoDiasSemana = null;
+let graficoHoras = null;
+
+// Cargar análisis al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarAnalisis();
+});
+
+function cargarAnalisis() {
+    // Mostrar spinner
+    document.getElementById('loading-spinner').style.display = 'block';
+    document.getElementById('analisis-content').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+    
+    fetch('/api/analisis/insights')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Ocultar spinner y mostrar contenido
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('analisis-content').style.display = 'block';
+            
+            // Procesar datos
+            mostrarRecomendaciones(data.recomendaciones);
+            mostrarAnalisisBuyin(data.analisis_buyin);
+            mostrarAnalisisJuego(data.analisis_juego);
+            mostrarAnalisisConsistencia(data.analisis_consistencia);
+            generarGraficos(data.analisis_temporal);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('error-text').textContent = error.message;
+        });
+}
+
+function mostrarRecomendaciones(recomendaciones) {
+    const container = document.getElementById('recomendaciones-container');
+    container.innerHTML = '';
+    
+    if (recomendaciones.length === 0) {
+        container.innerHTML = '<p class="text-muted">No hay recomendaciones específicas en este momento.</p>';
+        return;
+    }
+    
+    recomendaciones.forEach(rec => {
+        const prioridadClass = rec.prioridad === 'alta' ? 'alert-danger' : 
+                              rec.prioridad === 'media' ? 'alert-warning' : 'alert-info';
+        
+        const div = document.createElement('div');
+        div.className = `alert ${prioridadClass} mb-2`;
+        div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="alert-heading mb-1">${rec.titulo}</h6>
+                    <p class="mb-0">${rec.descripcion}</p>
+                </div>
+                <span class="badge bg-${rec.prioridad === 'alta' ? 'danger' : rec.prioridad === 'media' ? 'warning' : 'info'}">
+                    ${rec.prioridad.toUpperCase()}
+                </span>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function mostrarAnalisisBuyin(analisis) {
+    const tbody = document.getElementById('tabla-buyin');
+    tbody.innerHTML = '';
+    
+    Object.entries(analisis).forEach(([nivel, stats]) => {
+        const resultadoNeto = stats.total_ganancias - stats.total_invertido;
+        const colorROI = stats.roi >= 0 ? 'text-success' : 'text-danger';
+        const colorResultado = resultadoNeto >= 0 ? 'text-success' : 'text-danger';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><span class="badge bg-primary">${nivel}</span></td>
+            <td>${stats.total_torneos}</td>
+            <td class="text-danger">$${stats.total_invertido.toFixed(2)}</td>
+            <td class="text-success">$${stats.total_ganancias.toFixed(2)}</td>
+            <td class="${colorROI}">${stats.roi.toFixed(1)}%</td>
+            <td class="${colorResultado}">$${resultadoNeto.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function mostrarAnalisisJuego(analisis) {
+    const tbody = document.getElementById('tabla-juego');
+    tbody.innerHTML = '';
+    
+    Object.entries(analisis).forEach(([juego, stats]) => {
+        const resultadoNeto = stats.total_ganancias - stats.total_invertido;
+        const colorROI = stats.roi >= 0 ? 'text-success' : 'text-danger';
+        const colorResultado = resultadoNeto >= 0 ? 'text-success' : 'text-danger';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${juego}</td>
+            <td>${stats.total_torneos}</td>
+            <td>${stats.torneos_ganados}</td>
+            <td>${stats.porcentaje_victorias.toFixed(1)}%</td>
+            <td class="${colorROI}">${stats.roi.toFixed(1)}%</td>
+            <td class="${colorResultado}">$${resultadoNeto.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function mostrarAnalisisConsistencia(analisis) {
+    document.getElementById('dias-jugados').textContent = analisis.dias_jugados;
+    document.getElementById('dias-positivos').textContent = analisis.dias_positivos;
+    document.getElementById('dias-negativos').textContent = analisis.dias_negativos;
+    document.getElementById('consistencia-nivel').textContent = analisis.consistencia;
+    document.getElementById('resultado-promedio').textContent = `$${analisis.resultado_promedio_diario.toFixed(2)}`;
+    document.getElementById('coeficiente-variacion').textContent = `${analisis.coeficiente_variacion.toFixed(1)}%`;
+}
+
+function generarGraficos(analisisTemporal) {
+    // Gráfico de días de la semana
+    const ctxDias = document.getElementById('graficoDiasSemana');
+    if (graficoDiasSemana) {
+        graficoDiasSemana.destroy();
+    }
+    
+    const dias = analisisTemporal.por_dia_semana.map(d => d.dia);
+    const resultadosDias = analisisTemporal.por_dia_semana.map(d => d.resultado_promedio);
+    const coloresDias = resultadosDias.map(r => r >= 0 ? '#28a745' : '#dc3545');
+    
+    graficoDiasSemana = new Chart(ctxDias, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Resultado Promedio ($)',
+                data: resultadosDias,
+                backgroundColor: coloresDias,
+                borderColor: coloresDias,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toFixed(0);
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de horas
+    const ctxHoras = document.getElementById('graficoHoras');
+    if (graficoHoras) {
+        graficoHoras.destroy();
+    }
+    
+    const horas = analisisTemporal.por_hora.map(h => h.hora);
+    const resultadosHoras = analisisTemporal.por_hora.map(h => h.resultado_promedio);
+    const coloresHoras = resultadosHoras.map(r => r >= 0 ? '#28a745' : '#dc3545');
+    
+    graficoHoras = new Chart(ctxHoras, {
+        type: 'line',
+        data: {
+            labels: horas,
+            datasets: [{
+                label: 'Resultado Promedio ($)',
+                data: resultadosHoras,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toFixed(0);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

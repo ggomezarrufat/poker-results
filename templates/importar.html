@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-upload me-2"></i>Importar Resultados de Poker</h2>
+        <p class="text-muted">Selecciona la sala y sube tu archivo Excel con los resultados.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Subir Archivo</h5>
+            </div>
+            <div class="card-body">
+                <form id="importForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="sala" class="form-label">Sala de Poker</label>
+                        <select class="form-select" id="sala" name="sala" required>
+                            <option value="">Selecciona una sala...</option>
+                            <option value="WPN">WPN (Winning Poker Network)</option>
+                            <option value="Pokerstars">Pokerstars</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Archivo Excel</label>
+                        <input type="file" class="form-control" id="archivo" name="archivo" 
+                               accept=".xlsx,.xls" required>
+                        <div class="form-text">Formatos soportados: .xlsx, .xls</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="btnImportar">
+                        <i class="fas fa-upload me-2"></i>Importar Archivo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Información de Salas</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary">WPN</h6>
+                    <small class="text-muted">
+                        Archivos de historial de transacciones de WPN.
+                        Debe contener columnas: Fecha, Tipo, Descripción, Importe.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-success">Pokerstars</h6>
+                    <small class="text-muted">
+                        Archivos de historial de transacciones de Pokerstars.
+                        Debe contener columnas: Fecha, Tipo, Descripción, Importe.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div id="resultadoImportacion" style="display: none;">
+            <!-- Aquí se mostrarán los resultados de la importación -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('importForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const btnImportar = document.getElementById('btnImportar');
+    const resultadoDiv = document.getElementById('resultadoImportacion');
+    
+    // Mostrar loading
+    btnImportar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
+    btnImportar.disabled = true;
+    
+    fetch('/api/importar', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            resultadoDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>${data.error}
+                </div>
+            `;
+        } else {
+            let duplicadosHTML = '';
+            if (data.duplicados_detalle && data.duplicados_detalle.length > 0) {
+                duplicadosHTML = `
+                    <div class="mt-3">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Detalle de Duplicados Omitidos:</h6>
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-sm table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                        <th>Importe</th>
+                                        <th>Categoría</th>
+                                        <th>Juego</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+                
+                data.duplicados_detalle.forEach(dup => {
+                    duplicadosHTML += `
+                        <tr>
+                            <td>${dup.fecha}</td>
+                            <td>${dup.hora || '-'}</td>
+                            <td>${dup.tipo_movimiento}</td>
+                            <td class="text-truncate" style="max-width: 200px;" title="${dup.descripcion}">${dup.descripcion}</td>
+                            <td class="${dup.importe >= 0 ? 'text-success' : 'text-danger'}">$${dup.importe.toFixed(2)}</td>
+                            <td>${dup.categoria}</td>
+                            <td>${dup.tipo_juego}</td>
+                        </tr>
+                    `;
+                });
+                
+                duplicadosHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            resultadoDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>${data.mensaje}
+                    <br><small>Registros importados: ${data.resultados_importados} | Duplicados omitidos: ${data.duplicados_encontrados}</small>
+                    ${duplicadosHTML}
+                </div>
+            `;
+        }
+        resultadoDiv.style.display = 'block';
+    })
+    .catch(error => {
+        resultadoDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>Error al importar: ${error.message}
+            </div>
+        `;
+        resultadoDiv.style.display = 'block';
+    })
+    .finally(() => {
+        btnImportar.innerHTML = '<i class="fas fa-upload me-2"></i>Importar Archivo';
+        btnImportar.disabled = false;
+    });
+});
+</script>
+{% endblock %}

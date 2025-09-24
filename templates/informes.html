@@ -1,0 +1,611 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-bar me-2"></i>Informes de Resultados</h2>
+        <p class="text-muted">Analiza tus resultados económicos y estadísticas de juego.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Filtros</h6>
+            </div>
+            <div class="card-body">
+                <form id="filtrosForm">
+                    <div class="mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                    </div>
+                    
+                    <!-- Filtros rápidos de fechas -->
+                    <div class="mb-3">
+                        <label for="filtro_rapido" class="form-label">Filtros Rápidos</label>
+                        <select class="form-select" id="filtro_rapido" onchange="aplicarFiltroRapido(this.value)">
+                            <option value="">Seleccionar período...</option>
+                            <option value="hoy">📅 Hoy</option>
+                            <option value="ayer">📅 Ayer</option>
+                            <option value="esta_semana">📅 Esta Semana</option>
+                            <option value="este_mes">📅 Este Mes</option>
+                            <option value="mes_pasado">📅 Mes Pasado</option>
+                            <option value="este_año">📅 Este Año</option>
+                            <option value="año_pasado">📅 Año Pasado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tipo_movimiento" class="form-label">Tipo de Movimiento</label>
+                        <select class="form-select" id="tipo_movimiento" name="tipo_movimiento">
+                            <option value="">Todos</option>
+                            <option value="Buy-in">Buy-in</option>
+                            <option value="Cashout">Cashout</option>
+                            <option value="Fee">Fee</option>
+                            <option value="Prize">Prize</option>
+                        </select>
+                    </div>
+                    
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Categorías</label>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodos('categorias[]')">Todos</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deseleccionarTodos('categorias[]')">Ninguno</button>
+                            </div>
+                        </div>
+                        <div id="categorias-filtro" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Tipos de Juego</label>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodos('tipos_juego[]')">Todos</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deseleccionarTodos('tipos_juego[]')">Ninguno</button>
+                            </div>
+                        </div>
+                        <div id="tipos-juego-filtro" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Nivel de Buy-in</label>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodos('niveles_buyin[]')">Todos</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deseleccionarTodos('niveles_buyin[]')">Ninguno</button>
+                            </div>
+                        </div>
+                        <div id="niveles-buyin-filtro" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Sala</label>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodos('salas[]')">Todos</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deseleccionarTodos('salas[]')">Ninguno</button>
+                            </div>
+                        </div>
+                        <div id="salas-filtro" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Aplicar Filtros
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Estadísticas Generales</h6>
+            </div>
+            <div class="card-body">
+                <div class="row" id="estadisticas">
+                    <!-- Primera fila -->
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-success mb-1" id="cantidad_torneos" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">0</h4>
+                            <small class="text-muted">Torneos Jugados</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-danger mb-1" id="total_invertido" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">$0.00</h4>
+                            <small class="text-muted">Total Invertido</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-success mb-1" id="total_ganancias" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">$0.00</h4>
+                            <small class="text-muted">Total Ganancias</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-info mb-1" id="total_registros" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">0</h4>
+                            <small class="text-muted">Total Registros</small>
+                            <div class="mt-2">
+                                <h5 class="text-secondary mb-0" id="suma_importes" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">$0.00</h5>
+                                <small class="text-muted">Suma Importes</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Segunda fila -->
+                    <div class="col-md-6 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-warning mb-1" id="roi" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">0%</h4>
+                            <small class="text-muted">ROI</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-center mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <h4 class="text-primary mb-1" id="resultado_economico" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">$0.00</h4>
+                            <small class="text-muted">Resultado Económico</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de resultados diarios -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Resultados Diarios (Últimos 10 Días)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoResultadosDiarios" style="height: 200px;"></canvas>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Resultados Detallados</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="tablaResultados">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Importe</th>
+                                <th>Categoría</th>
+                                <th>Juego</th>
+                                <th>Nivel Buy-in</th>
+                                <th>Sala</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los datos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let opcionesDisponibles = {};
+
+document.getElementById('filtrosForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    cargarInformes();
+});
+
+function cargarOpciones() {
+    fetch('/api/informes/opciones')
+    .then(response => response.json())
+    .then(data => {
+        opcionesDisponibles = data;
+        crearFiltrosMultiples();
+    })
+    .catch(error => {
+        console.error('Error al cargar opciones:', error);
+    });
+}
+
+function crearFiltrosMultiples() {
+    // Crear filtros de categorías
+    const categoriasDiv = document.getElementById('categorias-filtro');
+    categoriasDiv.innerHTML = '';
+    
+    opcionesDisponibles.categorias.forEach(categoria => {
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${categoria}" 
+                   id="cat_${categoria}" name="categorias[]">
+            <label class="form-check-label" for="cat_${categoria}">
+                ${categoria}
+            </label>
+        `;
+        categoriasDiv.appendChild(div);
+    });
+    
+    // Crear filtros de tipos de juego
+    const tiposJuegoDiv = document.getElementById('tipos-juego-filtro');
+    tiposJuegoDiv.innerHTML = '';
+    
+    opcionesDisponibles.tipos_juego.forEach(tipo => {
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${tipo}" 
+                   id="tipo_${tipo}" name="tipos_juego[]">
+            <label class="form-check-label" for="tipo_${tipo}">
+                ${tipo}
+            </label>
+        `;
+        tiposJuegoDiv.appendChild(div);
+    });
+    
+    // Crear filtros de niveles de buy-in
+    const nivelesBuyinDiv = document.getElementById('niveles-buyin-filtro');
+    nivelesBuyinDiv.innerHTML = '';
+    
+    opcionesDisponibles.niveles_buyin.forEach(nivel => {
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${nivel}" 
+                   id="nivel_${nivel}" name="niveles_buyin[]">
+            <label class="form-check-label" for="nivel_${nivel}">
+                ${nivel}
+            </label>
+        `;
+        nivelesBuyinDiv.appendChild(div);
+    });
+    
+    // Crear filtros de salas
+    const salasDiv = document.getElementById('salas-filtro');
+    salasDiv.innerHTML = '';
+    
+    opcionesDisponibles.salas.forEach(sala => {
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${sala}" 
+                   id="sala_${sala}" name="salas[]">
+            <label class="form-check-label" for="sala_${sala}">
+                ${sala}
+            </label>
+        `;
+        salasDiv.appendChild(div);
+    });
+    
+    // Actualizar opciones de tipo de movimiento
+    const tipoMovimientoSelect = document.getElementById('tipo_movimiento');
+    tipoMovimientoSelect.innerHTML = '<option value="">Todos</option>';
+    opcionesDisponibles.tipos_movimiento.forEach(tipo => {
+        const option = document.createElement('option');
+        option.value = tipo;
+        option.textContent = tipo;
+        tipoMovimientoSelect.appendChild(option);
+    });
+}
+
+function cargarInformes() {
+    const formData = new FormData(document.getElementById('filtrosForm'));
+    const params = new URLSearchParams();
+    
+    // Agregar filtros básicos
+    for (let [key, value] of formData.entries()) {
+        if (value && key !== 'categorias[]' && key !== 'tipos_juego[]' && key !== 'niveles_buyin[]' && key !== 'salas[]') {
+            params.append(key, value);
+        }
+    }
+    
+    // Agregar filtros múltiples
+    const categoriasSeleccionadas = Array.from(document.querySelectorAll('input[name="categorias[]"]:checked'))
+        .map(cb => cb.value);
+    categoriasSeleccionadas.forEach(cat => params.append('categorias[]', cat));
+    
+    const tiposJuegoSeleccionados = Array.from(document.querySelectorAll('input[name="tipos_juego[]"]:checked'))
+        .map(cb => cb.value);
+    tiposJuegoSeleccionados.forEach(tipo => params.append('tipos_juego[]', tipo));
+    
+    const nivelesBuyinSeleccionados = Array.from(document.querySelectorAll('input[name="niveles_buyin[]"]:checked'))
+        .map(cb => cb.value);
+    nivelesBuyinSeleccionados.forEach(nivel => params.append('niveles_buyin[]', nivel));
+    
+    const salasSeleccionadas = Array.from(document.querySelectorAll('input[name="salas[]"]:checked'))
+        .map(cb => cb.value);
+    salasSeleccionadas.forEach(sala => params.append('salas[]', sala));
+    
+    fetch(`/api/informes/resultados?${params}`)
+    .then(response => response.json())
+    .then(data => {
+        // Actualizar estadísticas
+        document.getElementById('cantidad_torneos').textContent = 
+            data.estadisticas.cantidad_torneos;
+        document.getElementById('total_registros').textContent = 
+            data.estadisticas.total_registros;
+        
+        // Suma de importes
+        const sumaImportes = data.estadisticas.suma_importes;
+        const colorSuma = sumaImportes >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('suma_importes').textContent = 
+            '$' + sumaImportes.toFixed(2);
+        document.getElementById('suma_importes').className = 
+            colorSuma + ' mb-0';
+        
+        // Nuevas estadísticas
+        document.getElementById('total_invertido').textContent = 
+            '$' + data.estadisticas.total_invertido.toFixed(2);
+        document.getElementById('total_ganancias').textContent = 
+            '$' + data.estadisticas.total_ganancias.toFixed(2);
+        
+        // ROI calculado correctamente
+        document.getElementById('roi').textContent = 
+            data.estadisticas.roi.toFixed(1) + '%';
+        
+        // Resultado económico
+        const resultadoEconomico = data.estadisticas.resultado_economico;
+        const colorResultado = resultadoEconomico >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('resultado_economico').textContent = 
+            '$' + resultadoEconomico.toFixed(2);
+        document.getElementById('resultado_economico').className = 
+            colorResultado;
+        
+        // Generar gráfico de resultados diarios cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    generarGraficoResultadosDiarios(data.resultados_diarios);
+                }, 1000);
+            });
+        } else {
+            setTimeout(() => {
+                generarGraficoResultadosDiarios(data.resultados_diarios);
+            }, 1000);
+        }
+        
+        // Actualizar tabla
+        const tbody = document.querySelector('#tablaResultados tbody');
+        tbody.innerHTML = '';
+        
+        data.resultados.forEach(resultado => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${resultado.fecha}</td>
+                <td>${resultado.hora || '-'}</td>
+                <td>${resultado.tipo_movimiento}</td>
+                <td>${resultado.descripcion}</td>
+                <td class="${resultado.importe >= 0 ? 'text-success' : 'text-danger'}">
+                    $${resultado.importe.toFixed(2)}
+                </td>
+                <td>${resultado.categoria}</td>
+                <td>${resultado.tipo_juego}</td>
+                <td>${resultado.nivel_buyin || '-'}</td>
+                <td>${resultado.sala}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        console.error('Error al cargar informes:', error);
+        alert('Error al cargar los informes');
+    });
+}
+
+// Funciones para seleccionar/deseleccionar todos los filtros
+// Función para aplicar filtros rápidos de fechas
+function aplicarFiltroRapido(tipo) {
+    // Si no se seleccionó nada, no hacer nada
+    if (!tipo) return;
+    
+    const hoy = new Date();
+    const fechaInicio = document.getElementById('fecha_inicio');
+    const fechaFin = document.getElementById('fecha_fin');
+    const filtroRapido = document.getElementById('filtro_rapido');
+    
+    let inicio, fin;
+    
+    switch(tipo) {
+        case 'hoy':
+            inicio = fin = hoy;
+            break;
+            
+        case 'ayer':
+            const ayer = new Date(hoy);
+            ayer.setDate(hoy.getDate() - 1);
+            inicio = fin = ayer;
+            break;
+            
+        case 'esta_semana':
+            const inicioSemana = new Date(hoy);
+            inicioSemana.setDate(hoy.getDate() - hoy.getDay()); // Domingo
+            const finSemana = new Date(hoy);
+            finSemana.setDate(hoy.getDate() + (6 - hoy.getDay())); // Sábado
+            inicio = inicioSemana;
+            fin = finSemana;
+            break;
+            
+        case 'este_mes':
+            inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            break;
+            
+        case 'mes_pasado':
+            const mesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+            inicio = new Date(mesPasado.getFullYear(), mesPasado.getMonth(), 1);
+            fin = new Date(mesPasado.getFullYear(), mesPasado.getMonth() + 1, 0);
+            break;
+            
+        case 'este_año':
+            inicio = new Date(hoy.getFullYear(), 0, 1);
+            fin = new Date(hoy.getFullYear(), 11, 31);
+            break;
+            
+        case 'año_pasado':
+            const añoPasado = hoy.getFullYear() - 1;
+            inicio = new Date(añoPasado, 0, 1);
+            fin = new Date(añoPasado, 11, 31);
+            break;
+            
+        default:
+            return;
+    }
+    
+    // Formatear fechas para el input date (YYYY-MM-DD)
+    const formatearFecha = (fecha) => {
+        return fecha.getFullYear() + '-' + 
+               String(fecha.getMonth() + 1).padStart(2, '0') + '-' + 
+               String(fecha.getDate()).padStart(2, '0');
+    };
+    
+    // Aplicar las fechas
+    fechaInicio.value = formatearFecha(inicio);
+    fechaFin.value = formatearFecha(fin);
+    
+    // Resetear el menú desplegable
+    filtroRapido.value = '';
+    
+    // Recargar informes automáticamente
+    cargarInformes();
+}
+
+function seleccionarTodos(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    checkboxes.forEach(cb => cb.checked = true);
+}
+
+function deseleccionarTodos(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+// Función para generar el gráfico de resultados diarios
+function generarGraficoResultadosDiarios(resultadosDiarios) {
+    console.log('Intentando generar gráfico...', resultadosDiarios);
+    
+    const ctx = document.getElementById('graficoResultadosDiarios');
+    
+    // Verificar que el elemento existe
+    if (!ctx) {
+        console.error('No se encontró el elemento graficoResultadosDiarios');
+        return;
+    }
+    
+    // Verificar que el elemento está visible y tiene dimensiones
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        console.error('El elemento graficoResultadosDiarios no tiene dimensiones visibles');
+        console.log('Reintentando en 500ms...');
+        setTimeout(() => {
+            generarGraficoResultadosDiarios(resultadosDiarios);
+        }, 500);
+        return;
+    }
+    
+    console.log('Elemento encontrado:', ctx);
+    console.log('Dimensiones:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    
+    // Destruir gráfico existente si existe
+    if (window.graficoResultadosDiarios && typeof window.graficoResultadosDiarios.destroy === 'function') {
+        console.log('Destruyendo gráfico existente...');
+        window.graficoResultadosDiarios.destroy();
+    }
+    
+    // Preparar datos
+    const fechas = resultadosDiarios.map(d => {
+        const fecha = new Date(d.fecha);
+        return fecha.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    });
+    
+    const resultados = resultadosDiarios.map(d => d.resultado);
+    const colores = resultados.map(r => r >= 0 ? '#28a745' : '#dc3545');
+    
+    // Crear gráfico con manejo de errores
+    console.log('Preparando datos para el gráfico...');
+    console.log('Fechas:', fechas);
+    console.log('Resultados:', resultados);
+    console.log('Colores:', colores);
+    
+    try {
+        console.log('Creando gráfico con Chart.js...');
+        window.graficoResultadosDiarios = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: fechas,
+                datasets: [{
+                    label: 'Resultado Diario ($)',
+                    data: resultados,
+                    backgroundColor: colores,
+                    borderColor: colores,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const valor = context.parsed.y;
+                                const movimientos = resultadosDiarios[context.dataIndex].movimientos;
+                                return `$${valor.toFixed(2)} (${movimientos} movimientos)`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al crear el gráfico:', error);
+        // Mostrar mensaje de error en el contenedor
+        ctx.innerHTML = '<div class="alert alert-warning">Error al cargar el gráfico de resultados diarios</div>';
+    }
+}
+
+// Cargar opciones y informes al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarOpciones();
+    // Cargar informes después de un pequeño delay para que se carguen las opciones
+    setTimeout(cargarInformes, 500);
+});
+</script>
+{% endblock %}

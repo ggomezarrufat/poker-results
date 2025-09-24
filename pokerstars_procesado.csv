@@ -1,0 +1,200 @@
+Date/Time,Action,Table Name / Player / Tournament #,Game,Payment method,Account Currency,Amount,Accrued StarsCoin,T Money,W Money,Balance,Total Accrued StarsCoin After this Transaction,T Money,W Money,Amount_clean,Amount_numeric
+2025/09/01 7:59 PM,Casino: Monthly CPP Counter Reset,71828714,,,USD,0.00,0.00,0.00,0.00,304.14,0.00,0.00,0.00,0.00,0.0
+2025/09/01 7:59 PM,Tournament Registration,3923190575,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,301.94,0.00,0.00,0.00,-2.20,-2.2
+2025/09/01 8:07 PM,Tournament Re-entry,3923190575,,,USD,(2.20),0.00,0.00,0.00,299.74,0.00,0.00,0.00,-2.20,-2.2
+2025/09/01 8:10 PM,Tournament Re-entry,3923190575,,,USD,(2.20),0.00,0.00,0.00,297.54,0.00,0.00,0.00,-2.20,-2.2
+2025/09/04 4:42 PM,Real Money Transfer Received,3580281189,,,USD,30.00,0.00,0.00,0.00,327.54,0.00,0.00,0.00,30.00,30.0
+2025/09/04 7:35 PM,Tournament Registration,3924652775,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,325.34,0.00,0.00,0.00,-2.20,-2.2
+2025/09/04 8:09 PM,Tournament Re-entry,3924652775,,,USD,(2.20),0.00,0.00,0.00,323.14,0.00,0.00,0.00,-2.20,-2.2
+2025/09/04 8:41 PM,Tournament Interim Payout,3924652775,,,USD,4.13,0.00,0.00,0.00,327.27,0.00,0.00,0.00,4.13,4.13
+2025/09/04 9:24 PM,Tournament Won,3924652775,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,6.06,0.00,0.00,0.00,333.33,0.00,0.00,0.00,6.06,6.06
+2025/09/06 10:57 AM,Tournament Registration,3924652620,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,325.83,0.00,0.00,0.00,-7.50,-7.5
+2025/09/06 12:37 PM,Tournament Interim Payout,3924652620,,,USD,5.87,0.00,0.00,0.00,331.70,0.00,0.00,0.00,5.87,5.87
+2025/09/06 12:55 PM,Reward: Knockout Bounty,3924652620,,,USD,13.60,0.00,0.00,0.00,345.30,0.00,0.00,0.00,13.60,13.6
+2025/09/06 12:55 PM,Reward: Knockout Bounty,3924652620,,,USD,2.98,0.00,0.00,0.00,348.28,0.00,0.00,0.00,2.98,2.98
+2025/09/06 1:02 PM,Reward: Knockout Bounty,3924652620,,,USD,2.55,0.00,0.00,0.00,350.83,0.00,0.00,0.00,2.55,2.55
+2025/09/06 1:22 PM,Tournament Registration,3924652644,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,346.43,0.00,0.00,0.00,-4.40,-4.4
+2025/09/06 2:24 PM,Reward: Knockout Bounty,3924652620,,,USD,25.92,0.00,0.00,0.00,372.35,0.00,0.00,0.00,25.92,25.92
+2025/09/06 2:38 PM,Reward: Knockout Bounty,3924652644,,,USD,2.75,0.00,0.00,0.00,375.10,0.00,0.00,0.00,2.75,2.75
+2025/09/06 2:46 PM,Reward: Knockout Bounty,3924652644,,,USD,2.75,0.00,0.00,0.00,377.85,0.00,0.00,0.00,2.75,2.75
+2025/09/06 2:52 PM,Reward: Knockout Bounty,3924652620,,,USD,14.71,0.00,0.00,0.00,392.56,0.00,0.00,0.00,14.71,14.71
+2025/09/06 3:47 PM,Tournament Won,3924652620,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,73.58,0.00,0.00,0.00,466.14,0.00,0.00,0.00,73.58,73.58
+2025/09/06 7:50 PM,Tournament Registration,3924652777,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,463.94,0.00,0.00,0.00,-2.20,-2.2
+2025/09/07 9:23 AM,Tournament Registration,3924651982,"PL Omaha Buy-In: 9.80/1.20 Sunday KOmania $11 PLO8 [Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,452.94,0.00,0.00,0.00,-11.00,-11.0
+2025/09/07 10:03 AM,Tournament Re-entry,3924651982,,,USD,(11.00),0.00,0.00,0.00,441.94,0.00,0.00,0.00,-11.00,-11.0
+2025/09/07 10:24 AM,Reward: Knockout Bounty,3924651982,,,USD,2.50,0.00,0.00,0.00,444.44,0.00,0.00,0.00,2.50,2.5
+2025/09/07 11:09 AM,Tournament Registration,3924652621,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,436.94,0.00,0.00,0.00,-7.50,-7.5
+2025/09/07 11:22 AM,Reward: Knockout Bounty,3924651982,,,USD,2.50,0.00,0.00,0.00,439.44,0.00,0.00,0.00,2.50,2.5
+2025/09/07 11:32 AM,Tournament Interim Payout,3924651982,,,USD,10.41,0.00,0.00,0.00,449.85,0.00,0.00,0.00,10.41,10.41
+2025/09/07 12:02 PM,Tournament Re-entry,3924652621,,,USD,(7.50),0.00,0.00,0.00,442.35,0.00,0.00,0.00,-7.50,-7.5
+2025/09/07 1:24 PM,Tournament Won,3924651982,"PL Omaha Buy-In: 9.80/1.20 Sunday KOmania $11 PLO8 [Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,13.18,0.00,0.00,0.00,455.53,0.00,0.00,0.00,13.18,13.18
+2025/09/07 7:28 PM,Tournament Registration,3924652778,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,453.33,0.00,0.00,0.00,-2.20,-2.2
+2025/09/07 8:03 PM,Tournament Re-entry,3924652778,,,USD,(2.20),0.00,0.00,0.00,451.13,0.00,0.00,0.00,-2.20,-2.2
+2025/09/07 8:04 PM,Tournament Re-entry,3924652778,,,USD,(2.20),0.00,0.00,0.00,448.93,0.00,0.00,0.00,-2.20,-2.2
+2025/09/07 8:11 PM,Tournament Re-entry,3924652778,,,USD,(2.20),0.00,0.00,0.00,446.73,0.00,0.00,0.00,-2.20,-2.2
+2025/09/07 10:22 PM,Tournament Ticket Issued,7116039,,,USD,0.00,0.00,0.00,0.00,446.73,0.00,0.00,0.00,0.00,0.0
+2025/09/07 10:23 PM,Chest Reward,1550617811,,,USD,3.00,0.00,0.00,0.00,449.73,0.00,0.00,0.00,3.00,3.0
+2025/09/07 10:23 PM,Chest Reward,1550617816,,,USD,3.00,0.00,0.00,0.00,452.73,0.00,0.00,0.00,3.00,3.0
+2025/09/07 10:28 PM,Withdrawal,3581566351,,NETELLER2 withdrawal,USD,(300.00),0.00,0.00,0.00,152.73,0.00,0.00,0.00,-300.00,-300.0
+2025/09/08 8:05 PM,Tournament Registration,3925282026,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,150.53,0.00,0.00,0.00,-2.20,-2.2
+2025/09/08 8:12 PM,Tournament Re-entry,3925282026,,,USD,(2.20),0.00,0.00,0.00,148.33,0.00,0.00,0.00,-2.20,-2.2
+2025/09/08 8:15 PM,Tournament Registration,3925282019,"PL Omaha Buy-In: 4.90/0.60 $5.50 PLO8, #PrizeGuaranteedShort# Gtd",,USD,(5.50),0.00,0.00,0.00,142.83,0.00,0.00,0.00,-5.50,-5.5
+2025/09/08 8:21 PM,Tournament Re-entry,3925282019,,,USD,(5.50),0.00,0.00,0.00,137.33,0.00,0.00,0.00,-5.50,-5.5
+2025/09/08 8:25 PM,Tournament Re-entry,3925282019,,,USD,(5.50),0.00,0.00,0.00,131.83,0.00,0.00,0.00,-5.50,-5.5
+2025/09/09 7:32 PM,Tournament Registration,3925282027,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,129.63,0.00,0.00,0.00,-2.20,-2.2
+2025/09/09 8:44 PM,Tournament Interim Payout,3925282027,,,USD,3.69,0.00,0.00,0.00,133.32,0.00,0.00,0.00,3.69,3.69
+2025/09/09 9:41 PM,Tournament Won,3925282027,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,31.69,0.00,0.00,0.00,165.01,0.00,0.00,0.00,31.69,31.69
+2025/09/11 7:44 PM,Tournament Registration,3926847598,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,162.81,0.00,0.00,0.00,-2.20,-2.2
+2025/09/12 2:21 PM,Tournament Registration,3924436472,"PL Courchevel Buy-In: 14.70/1.80 WCOOP Side Event: $16.50 PL Courchevel H/L [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(16.50),0.00,0.00,0.00,146.31,0.00,0.00,0.00,-16.50,-16.5
+2025/09/12 2:31 PM,Tournament Re-entry,3924436472,,,USD,(16.50),0.00,0.00,0.00,129.81,0.00,0.00,0.00,-16.50,-16.5
+2025/09/12 3:06 PM,Reward: Knockout Bounty,3924436472,,,USD,5.55,0.00,0.00,0.00,135.36,0.00,0.00,0.00,5.55,5.55
+2025/09/12 3:09 PM,Tournament Re-entry,3924436472,,,USD,(16.50),0.00,0.00,0.00,118.86,0.00,0.00,0.00,-16.50,-16.5
+2025/09/12 3:10 PM,Reward: Knockout Bounty,3924436472,,,USD,3.70,0.00,0.00,0.00,122.56,0.00,0.00,0.00,3.70,3.7
+2025/09/12 3:17 PM,Reward: Knockout Bounty,3924436472,,,USD,3.70,0.00,0.00,0.00,126.26,0.00,0.00,0.00,3.70,3.7
+2025/09/12 3:40 PM,Tournament Registration,3924436475,"NL Omaha Buy-In: 3.92/0.48 WCOOP Side Event: $4.40 NL Omaha H/L [Heads-Up, Turbo, Progressive Total KO, Zoom], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,121.86,0.00,0.00,0.00,-4.40,-4.4
+2025/09/12 3:41 PM,Tournament Re-entry,3924436472,,,USD,(16.50),0.00,0.00,0.00,105.36,0.00,0.00,0.00,-16.50,-16.5
+2025/09/12 3:53 PM,Tournament Re-entry,3924436475,,,USD,(4.40),0.00,0.00,0.00,100.96,0.00,0.00,0.00,-4.40,-4.4
+2025/09/12 3:54 PM,Tournament Re-entry,3924436475,,,USD,(4.40),0.00,0.00,0.00,96.56,0.00,0.00,0.00,-4.40,-4.4
+2025/09/12 4:11 PM,Reward: Knockout Bounty,3924436475,,,USD,1.96,0.00,0.00,0.00,98.52,0.00,0.00,0.00,1.96,1.96
+2025/09/12 4:24 PM,Reward: Knockout Bounty,3924436475,,,USD,1.96,0.00,0.00,0.00,100.48,0.00,0.00,0.00,1.96,1.96
+2025/09/12 4:30 PM,Reward: Knockout Bounty,3924436475,,,USD,2.94,0.00,0.00,0.00,103.42,0.00,0.00,0.00,2.94,2.94
+2025/09/12 4:36 PM,Tournament Interim Payout,3924436472,,,USD,13.32,0.00,0.00,0.00,116.74,0.00,0.00,0.00,13.32,13.32
+2025/09/12 4:40 PM,Reward: Knockout Bounty,3924436475,,,USD,2.94,0.00,0.00,0.00,119.68,0.00,0.00,0.00,2.94,2.94
+2025/09/12 4:46 PM,Reward: Knockout Bounty,3924436472,,,USD,3.70,0.00,0.00,0.00,123.38,0.00,0.00,0.00,3.70,3.7
+2025/09/12 4:54 PM,Reward: Knockout Bounty,3924436472,,,USD,7.40,0.00,0.00,0.00,130.78,0.00,0.00,0.00,7.40,7.4
+2025/09/12 5:54 PM,Tournament Won,3924436472,"PL Courchevel Buy-In: 14.70/1.80 WCOOP Side Event: $16.50 PL Courchevel H/L [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,15.52,0.00,0.00,0.00,146.30,0.00,0.00,0.00,15.52,15.52
+2025/09/12 6:23 PM,Tournament Registration,3926847567,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,135.30,0.00,0.00,0.00,-11.00,-11.0
+2025/09/12 6:39 PM,Tournament Re-entry,3926847567,,,USD,(11.00),0.00,0.00,0.00,124.30,0.00,0.00,0.00,-11.00,-11.0
+2025/09/12 6:55 PM,Tournament Re-entry,3926847567,,,USD,(11.00),0.00,0.00,0.00,113.30,0.00,0.00,0.00,-11.00,-11.0
+2025/09/12 7:34 PM,Tournament Registration,3926847599,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,111.10,0.00,0.00,0.00,-2.20,-2.2
+2025/09/12 8:14 PM,Tournament Interim Payout,3926847567,,,USD,9.43,0.00,0.00,0.00,120.53,0.00,0.00,0.00,9.43,9.43
+2025/09/12 8:23 PM,Tournament Won,3926847567,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,1.13,0.00,0.00,0.00,121.66,0.00,0.00,0.00,1.13,1.13
+2025/09/12 8:46 PM,Tournament Interim Payout,3926847599,,,USD,4.15,0.00,0.00,0.00,125.81,0.00,0.00,0.00,4.15,4.15
+2025/09/13 9:22 AM,Tournament Registration,3926846738,"PL Omaha Buy-In: 9.80/1.20 KOmania $11 PLO8 [Saturday Special], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,114.81,0.00,0.00,0.00,-11.00,-11.0
+2025/09/13 9:27 AM,Tournament Re-entry,3926846738,,,USD,(11.00),0.00,0.00,0.00,103.81,0.00,0.00,0.00,-11.00,-11.0
+2025/09/13 9:36 AM,Tournament Re-entry,3926846738,,,USD,(11.00),0.00,0.00,0.00,92.81,0.00,0.00,0.00,-11.00,-11.0
+2025/09/13 10:25 AM,Tournament Registration,3926847437,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,85.31,0.00,0.00,0.00,-7.50,-7.5
+2025/09/13 10:38 AM,Reward: Knockout Bounty,3926847437,,,USD,1.70,0.00,0.00,0.00,87.01,0.00,0.00,0.00,1.70,1.7
+2025/09/13 10:44 AM,Reward: Knockout Bounty,3926847437,,,USD,2.55,0.00,0.00,0.00,89.56,0.00,0.00,0.00,2.55,2.55
+2025/09/13 12:38 PM,Tournament Interim Payout,3926847437,,,USD,5.78,0.00,0.00,0.00,95.34,0.00,0.00,0.00,5.78,5.78
+2025/09/13 12:52 PM,Reward: Knockout Bounty,3926847437,,,USD,8.50,0.00,0.00,0.00,103.84,0.00,0.00,0.00,8.50,8.5
+2025/09/13 1:12 PM,Tournament Won,3926847437,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,2.78,0.00,0.00,0.00,106.62,0.00,0.00,0.00,2.78,2.78
+2025/09/13 1:38 PM,Tournament Registration,3926847463,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,102.22,0.00,0.00,0.00,-4.40,-4.4
+2025/09/13 1:42 PM,Tournament Re-entry,3926847463,,,USD,(4.40),0.00,0.00,0.00,97.82,0.00,0.00,0.00,-4.40,-4.4
+2025/09/13 1:47 PM,Tournament Re-entry,3926847463,,,USD,(4.40),0.00,0.00,0.00,93.42,0.00,0.00,0.00,-4.40,-4.4
+2025/09/13 1:52 PM,Tournament Re-entry,3926847463,,,USD,(4.40),0.00,0.00,0.00,89.02,0.00,0.00,0.00,-4.40,-4.4
+2025/09/13 2:05 PM,Reward: Knockout Bounty,3926847463,,,USD,1.50,0.00,0.00,0.00,90.52,0.00,0.00,0.00,1.50,1.5
+2025/09/13 2:12 PM,Reward: Knockout Bounty,3926847463,,,USD,1.00,0.00,0.00,0.00,91.52,0.00,0.00,0.00,1.00,1.0
+2025/09/13 2:32 PM,Tournament Interim Payout,3926847463,,,USD,3.36,0.00,0.00,0.00,94.88,0.00,0.00,0.00,3.36,3.36
+2025/09/13 3:22 PM,Reward: Knockout Bounty,3926847463,,,USD,3.75,0.00,0.00,0.00,98.63,0.00,0.00,0.00,3.75,3.75
+2025/09/13 4:49 PM,Tournament Won,3926847463,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,9.60,0.00,0.00,0.00,108.23,0.00,0.00,0.00,9.60,9.6
+2025/09/13 7:56 PM,Tournament Registration,3926847600,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,106.03,0.00,0.00,0.00,-2.20,-2.2
+2025/09/13 7:58 PM,Tournament Registration,3926847592,"PL Omaha Buy-In: 4.90/0.60 $5.50 PLO8, #PrizeGuaranteedShort# Gtd",,USD,(5.50),0.00,0.00,0.00,100.53,0.00,0.00,0.00,-5.50,-5.5
+2025/09/13 8:31 PM,Tournament Re-entry,3926847592,,,USD,(5.50),0.00,0.00,0.00,95.03,0.00,0.00,0.00,-5.50,-5.5
+2025/09/13 8:36 PM,Tournament Interim Payout,3926847600,,,USD,3.41,0.00,0.00,0.00,98.44,0.00,0.00,0.00,3.41,3.41
+2025/09/13 8:39 PM,Tournament Re-entry,3926847592,,,USD,(5.50),0.00,0.00,0.00,92.94,0.00,0.00,0.00,-5.50,-5.5
+2025/09/13 10:16 PM,Tournament Won,3926847600,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,22.05,0.00,0.00,0.00,114.99,0.00,0.00,0.00,22.05,22.05
+2025/09/14 10:09 AM,Chest Reward,1551374825,,,USD,3.00,0.00,0.00,0.00,117.99,0.00,0.00,0.00,3.00,3.0
+2025/09/14 11:01 AM,Withdrawal,3583833575,,NETELLER2 withdrawal,USD,(50.00),0.00,0.00,0.00,67.99,0.00,0.00,0.00,-50.00,-50.0
+2025/09/14 11:01 AM,Tournament Registration,3926847438,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,60.49,0.00,0.00,0.00,-7.50,-7.5
+2025/09/14 1:05 PM,Tournament Interim Payout,3926847438,,,USD,6.13,0.00,0.00,0.00,66.62,0.00,0.00,0.00,6.13,6.13
+2025/09/14 1:20 PM,Tournament Won,3926847438,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,2.96,0.00,0.00,0.00,69.58,0.00,0.00,0.00,2.96,2.96
+2025/09/14 5:34 PM,Tournament Registration,3926846826,"NL Omaha Buy-In: 10.27/0.73 Hot Hyper KOmania $11 NLO8 [6-Max, Hyper-Turbo, Progressive KO, Weekend Special], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,58.58,0.00,0.00,0.00,-11.00,-11.0
+2025/09/14 5:41 PM,Reward: Knockout Bounty,3926846826,,,USD,2.50,0.00,0.00,0.00,61.08,0.00,0.00,0.00,2.50,2.5
+2025/09/14 6:04 PM,Tournament Registration,3925319868,"NL Omaha Buy-In: 5.05/0.45 WCOOP Side Event: $5.50 NLO8 [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(5.50),0.00,0.00,0.00,55.58,0.00,0.00,0.00,-5.50,-5.5
+2025/09/14 6:08 PM,Reward: Knockout Bounty,3925319868,,,USD,1.25,0.00,0.00,0.00,56.83,0.00,0.00,0.00,1.25,1.25
+2025/09/14 6:08 PM,Reward: Knockout Bounty,3925319868,,,USD,1.25,0.00,0.00,0.00,58.08,0.00,0.00,0.00,1.25,1.25
+2025/09/14 6:08 PM,Tournament Interim Payout,3926846826,,,USD,9.91,0.00,0.00,0.00,67.99,0.00,0.00,0.00,9.91,9.91
+2025/09/14 6:18 PM,Reward: Knockout Bounty,3925319868,,,USD,1.25,0.00,0.00,0.00,69.24,0.00,0.00,0.00,1.25,1.25
+2025/09/14 6:25 PM,Reward: Knockout Bounty,3925319868,,,USD,1.25,0.00,0.00,0.00,70.49,0.00,0.00,0.00,1.25,1.25
+2025/09/14 6:37 PM,Reward: Knockout Bounty,3925319868,,,USD,1.25,0.00,0.00,0.00,71.74,0.00,0.00,0.00,1.25,1.25
+2025/09/14 6:46 PM,Reward: Knockout Bounty,3925319868,,,USD,1.88,0.00,0.00,0.00,73.62,0.00,0.00,0.00,1.88,1.88
+2025/09/14 7:16 PM,Tournament Registration,3926847601,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,71.42,0.00,0.00,0.00,-2.20,-2.2
+2025/09/14 8:31 PM,Tournament Registration,3926846852,"PL Omaha Buy-In: 14.70/1.80 Hot KOmania $16.50 PLO8 [7-Max, Turbo, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(16.50),0.00,0.00,0.00,54.92,0.00,0.00,0.00,-16.50,-16.5
+2025/09/14 8:37 PM,Tournament Re-entry,3926846852,,,USD,(16.50),0.00,0.00,0.00,38.42,0.00,0.00,0.00,-16.50,-16.5
+2025/09/14 8:44 PM,Tournament Re-entry,3926846852,,,USD,(16.50),0.00,0.00,0.00,21.92,0.00,0.00,0.00,-16.50,-16.5
+2025/09/14 8:49 PM,Reward: Knockout Bounty,3926846852,,,USD,3.70,0.00,0.00,0.00,25.62,0.00,0.00,0.00,3.70,3.7
+2025/09/14 8:49 PM,Reward: Knockout Bounty,3926846852,,,USD,3.70,0.00,0.00,0.00,29.32,0.00,0.00,0.00,3.70,3.7
+2025/09/14 9:17 PM,Reward: Knockout Bounty,3926846852,,,USD,3.70,0.00,0.00,0.00,33.02,0.00,0.00,0.00,3.70,3.7
+2025/09/14 9:17 PM,Reward: Knockout Bounty,3926846852,,,USD,5.55,0.00,0.00,0.00,38.57,0.00,0.00,0.00,5.55,5.55
+2025/09/17 11:48 AM,Tournament Registration,3927405646,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,31.07,0.00,0.00,0.00,-7.50,-7.5
+2025/09/17 12:30 PM,Reward: Knockout Bounty,3927405646,,,USD,5.95,0.00,0.00,0.00,37.02,0.00,0.00,0.00,5.95,5.95
+2025/09/18 6:42 PM,Tournament Registration,3928912528,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,26.02,0.00,0.00,0.00,-11.00,-11.0
+2025/09/18 7:53 PM,Reward: Knockout Bounty,3928912528,,,USD,2.45,0.00,0.00,0.00,28.47,0.00,0.00,0.00,2.45,2.45
+2025/09/18 7:59 PM,Tournament Registration,3928912556,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,26.27,0.00,0.00,0.00,-2.20,-2.2
+2025/09/18 8:14 PM,Tournament Interim Payout,3928912528,,,USD,11.53,0.00,0.00,0.00,37.80,0.00,0.00,0.00,11.53,11.53
+2025/09/18 8:39 PM,Reward: Knockout Bounty,3928912528,,,USD,4.90,0.00,0.00,0.00,42.70,0.00,0.00,0.00,4.90,4.9
+2025/09/18 8:48 PM,Tournament Won,3928912528,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,26.42,0.00,0.00,0.00,69.12,0.00,0.00,0.00,26.42,26.42
+2025/09/18 8:49 PM,Tournament Registration,3928911864,"PL Omaha Buy-In: 14.70/1.80 Hot KOmania $16.50 PLO8 [7-Max, Turbo, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(16.50),0.00,0.00,0.00,52.62,0.00,0.00,0.00,-16.50,-16.5
+2025/09/19 11:01 AM,Tournament Registration,3928912397,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,45.12,0.00,0.00,0.00,-7.50,-7.5
+2025/09/19 11:16 AM,Tournament Re-entry,3928912397,,,USD,(7.50),0.00,0.00,0.00,37.62,0.00,0.00,0.00,-7.50,-7.5
+2025/09/19 11:50 AM,Tournament Re-entry,3928912397,,,USD,(7.50),0.00,0.00,0.00,30.12,0.00,0.00,0.00,-7.50,-7.5
+2025/09/19 11:55 AM,Tournament Re-entry,3928912397,,,USD,(7.50),0.00,0.00,0.00,22.62,0.00,0.00,0.00,-7.50,-7.5
+2025/09/19 1:05 PM,Tournament Interim Payout,3928912397,,,USD,6.02,0.00,0.00,0.00,28.64,0.00,0.00,0.00,6.02,6.02
+2025/09/19 1:11 PM,Tournament Registration,3927115790,"PL Badugi Buy-In: 9.80/1.20 WCOOP Side Event: $11 PL Badugi [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,17.64,0.00,0.00,0.00,-11.00,-11.0
+2025/09/19 1:31 PM,Tournament Re-entry,3927115790,,,USD,(11.00),0.00,0.00,0.00,6.64,0.00,0.00,0.00,-11.00,-11.0
+2025/09/19 1:34 PM,Tournament Registration,3928912423,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,2.24,0.00,0.00,0.00,-4.40,-4.4
+2025/09/19 2:19 PM,Tournament Interim Payout,3927115790,,,USD,8.73,0.00,0.00,0.00,10.97,0.00,0.00,0.00,8.73,8.73
+2025/09/19 2:25 PM,Reward: Knockout Bounty,3927115790,,,USD,2.50,0.00,0.00,0.00,13.47,0.00,0.00,0.00,2.50,2.5
+2025/09/19 2:25 PM,Reward: Knockout Bounty,3927115790,,,USD,2.50,0.00,0.00,0.00,15.97,0.00,0.00,0.00,2.50,2.5
+2025/09/19 3:05 PM,Tournament Won,3927115790,"PL Badugi Buy-In: 9.80/1.20 WCOOP Side Event: $11 PL Badugi [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,4.48,0.00,0.00,0.00,20.45,0.00,0.00,0.00,4.48,4.48
+2025/09/19 6:52 PM,Tournament Registration,3928912529,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,9.45,0.00,0.00,0.00,-11.00,-11.0
+2025/09/19 7:06 PM,Reward: Knockout Bounty,3928912529,,,USD,2.45,0.00,0.00,0.00,11.90,0.00,0.00,0.00,2.45,2.45
+2025/09/19 7:16 PM,Reward: Knockout Bounty,3928912529,,,USD,2.45,0.00,0.00,0.00,14.35,0.00,0.00,0.00,2.45,2.45
+2025/09/19 7:40 PM,Tournament Interim Payout,3928912529,,,USD,9.93,0.00,0.00,0.00,24.28,0.00,0.00,0.00,9.93,9.93
+2025/09/19 8:21 PM,Reward: Knockout Bounty,3928912529,,,USD,11.64,0.00,0.00,0.00,35.92,0.00,0.00,0.00,11.64,11.64
+2025/09/19 8:42 PM,Tournament Won,3928912529,"PL Omaha Buy-In: 9.80/1.20 $11 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,18.19,0.00,0.00,0.00,54.11,0.00,0.00,0.00,18.19,18.19
+2025/09/19 11:19 PM,Tournament Registration,3928911873,"PL Omaha Buy-In: 6.69/0.81 KOmania $7.50 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,46.61,0.00,0.00,0.00,-7.50,-7.5
+2025/09/19 11:38 PM,Reward: Knockout Bounty,3928911873,,,USD,1.70,0.00,0.00,0.00,48.31,0.00,0.00,0.00,1.70,1.7
+2025/09/20 12:11 AM,Tournament Interim Payout,3928911873,,,USD,6.52,0.00,0.00,0.00,54.83,0.00,0.00,0.00,6.52,6.52
+2025/09/20 12:34 AM,Tournament Won,3928911873,"PL Omaha Buy-In: 6.69/0.81 KOmania $7.50 PLO8 [7-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,2.27,0.00,0.00,0.00,57.10,0.00,0.00,0.00,2.27,2.27
+2025/09/20 11:18 AM,Tournament Registration,3928912398,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,49.60,0.00,0.00,0.00,-7.50,-7.5
+2025/09/20 11:38 AM,Tournament Re-entry,3928912398,,,USD,(7.50),0.00,0.00,0.00,42.10,0.00,0.00,0.00,-7.50,-7.5
+2025/09/20 11:53 AM,Tournament Re-entry,3928912398,,,USD,(7.50),0.00,0.00,0.00,34.60,0.00,0.00,0.00,-7.50,-7.5
+2025/09/20 1:07 PM,Tournament Registration,3928912424,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,30.20,0.00,0.00,0.00,-4.40,-4.4
+2025/09/20 1:09 PM,Reward: Knockout Bounty,3928912424,,,USD,1.00,0.00,0.00,0.00,31.20,0.00,0.00,0.00,1.00,1.0
+2025/09/20 1:32 PM,Reward: Knockout Bounty,3928912424,,,USD,1.00,0.00,0.00,0.00,32.20,0.00,0.00,0.00,1.00,1.0
+2025/09/21 8:46 AM,Tournament Registration,3928911767,"PL Omaha Buy-In: 9.80/1.20 Sunday KOmania $11 PLO8 [Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,21.20,0.00,0.00,0.00,-11.00,-11.0
+2025/09/21 9:20 AM,Tournament Re-entry,3928911767,,,USD,(11.00),0.00,0.00,0.00,10.20,0.00,0.00,0.00,-11.00,-11.0
+2025/09/21 9:25 AM,Tournament Ticket Issued,7116039,,,USD,0.00,0.00,0.00,0.00,10.20,0.00,0.00,0.00,0.00,0.0
+2025/09/21 9:26 AM,Chest Reward,1552731804,,,USD,3.00,0.00,0.00,0.00,13.20,0.00,0.00,0.00,3.00,3.0
+2025/09/21 9:26 AM,Tournament Re-entry,3928911767,,,USD,(11.00),0.00,0.00,0.00,2.20,0.00,0.00,0.00,-11.00,-11.0
+2025/09/21 10:02 AM,Deposit (Player),3586202932,,NETELLER2 purchase,USD,65.00,0.00,0.00,0.00,67.20,0.00,0.00,0.00,65.00,65.0
+2025/09/21 10:40 AM,Tournament Registration,3928912399,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,59.70,0.00,0.00,0.00,-7.50,-7.5
+2025/09/21 10:48 AM,Reward: Knockout Bounty,3928912399,,,USD,1.70,0.00,0.00,0.00,61.40,0.00,0.00,0.00,1.70,1.7
+2025/09/21 10:49 AM,Reward: Knockout Bounty,3928912399,,,USD,1.70,0.00,0.00,0.00,63.10,0.00,0.00,0.00,1.70,1.7
+2025/09/21 12:03 PM,Reward: Knockout Bounty,3928912399,,,USD,1.70,0.00,0.00,0.00,64.80,0.00,0.00,0.00,1.70,1.7
+2025/09/21 12:22 PM,Reward: Knockout Bounty,3928912399,,,USD,3.40,0.00,0.00,0.00,68.20,0.00,0.00,0.00,3.40,3.4
+2025/09/21 12:22 PM,Reward: Knockout Bounty,3928912399,,,USD,2.55,0.00,0.00,0.00,70.75,0.00,0.00,0.00,2.55,2.55
+2025/09/21 12:32 PM,Reward: Knockout Bounty,3928912399,,,USD,1.70,0.00,0.00,0.00,72.45,0.00,0.00,0.00,1.70,1.7
+2025/09/21 12:44 PM,Tournament Interim Payout,3928912399,,,USD,6.13,0.00,0.00,0.00,78.58,0.00,0.00,0.00,6.13,6.13
+2025/09/21 1:16 PM,Reward: Knockout Bounty,3928912399,,,USD,2.55,0.00,0.00,0.00,81.13,0.00,0.00,0.00,2.55,2.55
+2025/09/21 1:42 PM,Reward: Knockout Bounty,3928912399,,,USD,8.08,0.00,0.00,0.00,89.21,0.00,0.00,0.00,8.08,8.08
+2025/09/21 1:56 PM,Tournament Registration,3922277652,"NL Omaha Buy-In: 20.00/2.00 WCOOP 74-L: $22 NLO8 [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd - 2-Day Event",,USD,(22.00),0.00,0.00,0.00,67.21,0.00,0.00,0.00,-22.00,-22.0
+2025/09/21 2:31 PM,Reward: Knockout Bounty,3928912399,,,USD,5.74,0.00,0.00,0.00,72.95,0.00,0.00,0.00,5.74,5.74
+2025/09/21 2:40 PM,Tournament Won,3928912399,"PL Courchevel Buy-In: 6.69/0.81 $7.50 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,21.18,0.00,0.00,0.00,94.13,0.00,0.00,0.00,21.18,21.18
+2025/09/21 7:51 PM,Tournament Registration,3928912559,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,91.93,0.00,0.00,0.00,-2.20,-2.2
+2025/09/21 8:41 PM,Tournament Interim Payout,3928912559,,,USD,4.28,0.00,0.00,0.00,96.21,0.00,0.00,0.00,4.28,4.28
+2025/09/22 2:31 PM,Tournament Registration,3922277669,"PL 5 Card Omaha Buy-In: 9.80/1.20 WCOOP 79-L: $11 5-Card PLO8 [6-Max], #PrizeGuaranteedShort# Gtd",,USD,(11.00),0.00,0.00,0.00,85.21,0.00,0.00,0.00,-11.00,-11.0
+2025/09/22 2:49 PM,Tournament Re-entry,3922277669,,,USD,(11.00),0.00,0.00,0.00,74.21,0.00,0.00,0.00,-11.00,-11.0
+2025/09/22 2:53 PM,Tournament Re-entry,3922277669,,,USD,(11.00),0.00,0.00,0.00,63.21,0.00,0.00,0.00,-11.00,-11.0
+2025/09/22 3:52 PM,Tournament Registration,3929498992,"NL Courchevel Buy-In: 6.69/0.81 $7.50 NL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(7.50),0.00,0.00,0.00,55.71,0.00,0.00,0.00,-7.50,-7.5
+2025/09/22 4:24 PM,Tournament Interim Payout,3922277669,,,USD,18.29,0.00,0.00,0.00,74.00,0.00,0.00,0.00,18.29,18.29
+2025/09/22 8:02 PM,Tournament Registration,3929499044,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,71.80,0.00,0.00,0.00,-2.20,-2.2
+2025/09/22 8:45 PM,Tournament Interim Payout,3929499044,,,USD,3.84,0.00,0.00,0.00,75.64,0.00,0.00,0.00,3.84,3.84
+2025/09/22 9:53 PM,Tournament Won,3929499044,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,19.59,0.00,0.00,0.00,95.23,0.00,0.00,0.00,19.59,19.59
+2025/09/23 12:17 PM,Tournament Registration,3922277521,"PL Omaha Buy-In: 4.90/0.60 WCOOP 83-L: $5.50 PLO8 [6-Max], #PrizeGuaranteedShort# Gtd",,USD,(5.50),0.00,0.00,0.00,89.73,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 12:44 PM,Tournament Re-entry,3922277521,,,USD,(5.50),0.00,0.00,0.00,84.23,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 12:45 PM,Tournament Registration,3929498946,"PL Courchevel Buy-In: 3.92/0.48 $4.40 PL Courchevel Hi/Lo [6-Max, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(4.40),0.00,0.00,0.00,79.83,0.00,0.00,0.00,-4.40,-4.4
+2025/09/23 1:04 PM,Tournament Re-entry,3922277521,,,USD,(5.50),0.00,0.00,0.00,74.33,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 1:37 PM,Tournament Re-entry,3922277521,,,USD,(5.50),0.00,0.00,0.00,68.83,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 1:44 PM,Tournament Re-entry,3922277521,,,USD,(5.50),0.00,0.00,0.00,63.33,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 1:46 PM,Reward: Knockout Bounty,3929498946,,,USD,1.00,0.00,0.00,0.00,64.33,0.00,0.00,0.00,1.00,1.0
+2025/09/23 1:53 PM,Reward: Knockout Bounty,3929498946,,,USD,1.00,0.00,0.00,0.00,65.33,0.00,0.00,0.00,1.00,1.0
+2025/09/23 1:55 PM,Tournament Re-entry,3922277521,,,USD,(5.50),0.00,0.00,0.00,59.83,0.00,0.00,0.00,-5.50,-5.5
+2025/09/23 1:56 PM,Tournament Re-entry,3929498946,,,USD,(4.40),0.00,0.00,0.00,55.43,0.00,0.00,0.00,-4.40,-4.4
+2025/09/23 2:55 PM,Tournament Interim Payout,3922277521,,,USD,9.16,0.00,0.00,0.00,64.59,0.00,0.00,0.00,9.16,9.16
+2025/09/23 4:32 PM,Tournament Registration,3929498375,"PL Omaha Buy-In: 2.94/0.36 Hot KOmania $3.30 PLO8 [8-Max, Turbo, Progressive KO], #PrizeGuaranteedShort# Gtd",,USD,(3.30),0.00,0.00,0.00,61.29,0.00,0.00,0.00,-3.30,-3.3
+2025/09/23 6:30 PM,Tournament Won,3922277521,"PL Omaha Buy-In: 4.90/0.60 WCOOP 83-L: $5.50 PLO8 [6-Max], #PrizeGuaranteedShort# Gtd",,USD,71.44,0.00,0.00,0.00,132.73,0.00,0.00,0.00,71.44,71.44
+2025/09/23 7:21 PM,Tournament Registration,3929499045,"PL Courchevel Buy-In: 1.96/0.24 $2.20 PL Courchevel Hi/Lo [6-Max, Turbo], #PrizeGuaranteedShort# Gtd",,USD,(2.20),0.00,0.00,0.00,130.53,0.00,0.00,0.00,-2.20,-2.2
+2025/09/23 7:50 PM,Tournament Re-entry,3929499045,,,USD,(2.20),0.00,0.00,0.00,128.33,0.00,0.00,0.00,-2.20,-2.2
