@@ -38,7 +38,7 @@ ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'html'}
 
 # Crear carpetas si no existen
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(PROSADOS_FOLDER, exist_ok=True)
+os.makedirs(PROCESADOS_FOLDER, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESADOS_FOLDER'] = PROCESADOS_FOLDER
@@ -712,3 +712,9 @@ def api_importar():
         return jsonify({'error': f'Error procesando archivo: {str(e)}'}), 500
 
 # Continuará en la siguiente parte...
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
