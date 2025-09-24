@@ -14,10 +14,5 @@
   ],
   "env": {
     "FLASK_ENV": "production"
-  },
-  "functions": {
-    "app_multiusuario.py": {
-      "maxDuration": 30
-    }
   }
 }
