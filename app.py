@@ -150,7 +150,7 @@ def reclasificar_niveles_buyin_automatica():
         # Obtener registros de torneos sin clasificar (todos los tipos de movimiento de torneos)
         registros_sin_clasificar = PokerResult.query.filter(
             PokerResult.categoria == 'Torneo',
-            PokerResult.tipo_movimiento.in_(['Bounty', 'Winnings', 'Sit & Crush Jackpot', 'Fee', 'Reentry Fee', 'Reentry Buy In', 'Unregister Buy In', 'Unregister Fee', 'Tournament Rebuy']),
+            PokerResult.tipo_movimiento.in_(['Bounty', 'Winnings', 'Sit & Crush Jackpot', 'Fee', 'Reentry Fee', 'Reentry Buy In', 'Unregister Buy In', 'Unregister Fee', 'Tournament Rebuy', 'Ticket']),
             PokerResult.nivel_buyin.is_(None)
         ).all()
         
@@ -227,7 +227,7 @@ def reclasificar_tipos_juego_automatica():
         # Obtener registros que necesitan reclasificación (solo los que tienen tipo genérico)
         registros_sin_clasificar = PokerResult.query.filter(
             PokerResult.categoria == 'Torneo',
-            PokerResult.tipo_movimiento.in_(['Reentry Buy In', 'Winnings', 'Bounty', 'Fee', 'Reentry Fee', 'Unregister Buy In', 'Unregister Fee', 'Sit & Crush Jackpot', 'Tournament Rebuy']),
+            PokerResult.tipo_movimiento.in_(['Reentry Buy In', 'Winnings', 'Bounty', 'Fee', 'Reentry Fee', 'Unregister Buy In', 'Unregister Fee', 'Sit & Crush Jackpot', 'Tournament Rebuy', 'Ticket']),
             PokerResult.tipo_juego == 'Torneo'  # Solo los que tienen tipo genérico
         ).all()
         
@@ -600,8 +600,16 @@ def categorizar_movimiento_pokerstars(action, game, tournament_id):
     # Determinar tipo de juego - priorizar información de la columna Game
     if game and game.strip():
         # Si hay información en la columna Game, usarla para determinar el tipo
-        # Detectar Courchevel ANTES que PLO genérico
-        if 'courchevel' in game_lower:
+        # Detectar tipos específicos ANTES que patrones genéricos
+        if 'badugi' in game_lower:
+            tipo_juego = 'PL Badugi'
+        elif 'limit horse' in game_lower:
+            tipo_juego = 'Limit Horse'
+        elif '8-game' in game_lower or '8 game' in game_lower:
+            tipo_juego = 'Limit 8-Game'
+        elif 'horse' in game_lower:
+            tipo_juego = 'HORSE'
+        elif 'courchevel' in game_lower:
             tipo_juego = 'PL Courchevel Hi/Lo'
         elif 'plo' in game_lower or 'omaha' in game_lower:
             if 'hi/lo' in game_lower or 'hi lo' in game_lower:
