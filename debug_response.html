@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Resultados de Poker</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .table-responsive {
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>Poker Results Analyzer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/importar">
+                            <i class="fas fa-upload me-1"></i>Importar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/informes">
+                            <i class="fas fa-chart-bar me-1"></i>Informes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analisis">
+                            <i class="fas fa-brain me-1"></i>Análisis
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i>admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><h6 class="dropdown-header">admin@poker-results.com</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        
+            
+                
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ¡Bienvenido!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                
+            
+        
+
+        
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">
+                <i class="fas fa-chart-line me-3"></i>Analizador de Resultados de Poker
+            </h1>
+            <p class="lead">Importa y analiza tus resultados de poker de diferentes salas en un solo lugar.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                <h4 class="card-title">Importar Resultados</h4>
+                <p class="card-text">Sube archivos Excel de tus resultados de WPN, Pokerstars y otras salas.</p>
+                <a href="/importar" class="btn btn-primary">
+                    <i class="fas fa-upload me-2"></i>Importar Archivos
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                <h4 class="card-title">Generar Informes</h4>
+                <p class="card-text">Analiza tus resultados económicos, torneos jugados y ROI.</p>
+                <a href="/informes" class="btn btn-success">
+                    <i class="fas fa-chart-bar me-2"></i>Ver Informes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                <h4 class="card-title">Análisis Avanzado</h4>
+                <p class="card-text">Descubre insights y patrones en tu juego para mejorar tu rendimiento.</p>
+                <a href="/analisis" class="btn btn-info">
+                    <i class="fas fa-chart-line me-2"></i>Ver Análisis
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Eliminar por sala -->
+                <div class="mb-4">
+                    <h6>Eliminar por Sala</h6>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <select class="form-select" id="sala-select" onchange="actualizarContadorSala()">
+                                <option value="">Seleccionar sala...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-warning" onclick="eliminarPorSala()" id="btn-eliminar-sala" disabled>
+                                <i class="fas fa-trash me-2"></i>Eliminar Sala
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted" id="contador-sala">Selecciona una sala para ver cuántos registros serán eliminados</small>
+                </div>
+                
+                <hr>
+                
+                <!-- Eliminar todo -->
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="mb-1">Eliminar Todos los Registros</h6>
+                        <p class="text-muted mb-0">Esta acción eliminará permanentemente todos los datos de la base de datos.</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button type="button" class="btn btn-danger" id="btnEliminarTodos">
+                            <i class="fas fa-trash me-2"></i>Eliminar Todo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+<script>
+document.getElementById('btnEliminarTodos').addEventListener('click', function() {
+    // Mostrar modal de confirmación
+    const modal = `
+        <div class="modal fade" id="confirmModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <strong>¡ADVERTENCIA!</strong> Esta acción eliminará permanentemente todos los registros de la base de datos.
+                        </div>
+                        <p>¿Estás seguro de que quieres continuar?</p>
+                        <div id="registrosInfo" class="text-muted">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Cargando información...
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete">
+                            <i class="fas fa-trash me-2"></i>Eliminar Todo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modal);
+    const modalElement = new bootstrap.Modal(document.getElementById('confirmModal'));
+    
+    // Cargar información de registros
+    fetch('/api/informes/resultados')
+    .then(response => response.json())
+    .then(data => {
+        const totalRegistros = data.estadisticas.total_registros;
+        document.getElementById('registrosInfo').innerHTML = `
+            <strong>Total de registros a eliminar:</strong> ${totalRegistros}
+            <br><small>Incluye: ${data.estadisticas.cantidad_torneos} torneos, $${data.estadisticas.total_importe.toFixed(2)} en importes</small>
+        `;
+    })
+    .catch(error => {
+        document.getElementById('registrosInfo').innerHTML = 'Error al cargar información';
+    });
+    
+    // Mostrar modal
+    modalElement.show();
+    
+    // Manejar confirmación
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        // Deshabilitar botón
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+        
+        // Realizar eliminación
+        fetch('/api/eliminar-todos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert('✅ ' + data.mensaje);
+                // Recargar página para actualizar estadísticas
+                location.reload();
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            modalElement.hide();
+            // Limpiar modal del DOM
+            document.getElementById('confirmModal').remove();
+        });
+    });
+    
+    // Limpiar modal cuando se cierre
+    document.getElementById('confirmModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+});
+
+// Cargar salas disponibles al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarSalasDisponibles();
+});
+
+function cargarSalasDisponibles() {
+    fetch('/api/salas-disponibles')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('sala-select');
+            select.innerHTML = '<option value="">Seleccionar sala...</option>';
+            
+            data.salas.forEach(sala => {
+                const option = document.createElement('option');
+                option.value = sala.sala;
+                option.textContent = `${sala.sala} (${sala.registros} registros)`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error cargando salas:', error);
+        });
+}
+
+function actualizarContadorSala() {
+    const select = document.getElementById('sala-select');
+    const btnEliminar = document.getElementById('btn-eliminar-sala');
+    const contador = document.getElementById('contador-sala');
+    
+    if (select.value) {
+        const option = select.options[select.selectedIndex];
+        const text = option.textContent;
+        const match = text.match(/\((\d+) registros\)/);
+        
+        if (match) {
+            const registros = match[1];
+            contador.textContent = `Se eliminarán ${registros} registros de la sala ${select.value}`;
+            btnEliminar.disabled = false;
+        }
+    } else {
+        contador.textContent = 'Selecciona una sala para ver cuántos registros serán eliminados';
+        btnEliminar.disabled = true;
+    }
+}
+
+function eliminarPorSala() {
+    const select = document.getElementById('sala-select');
+    const sala = select.value;
+    
+    if (!sala) {
+        alert('Por favor selecciona una sala');
+        return;
+    }
+    
+    const option = select.options[select.selectedIndex];
+    const text = option.textContent;
+    const match = text.match(/\((\d+) registros\)/);
+    const registros = match ? match[1] : '0';
+    
+    // Mostrar modal de confirmación
+    const modal = `
+        <div class="modal fade" id="confirmSalaModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación por Sala
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <strong>¡ADVERTENCIA!</strong> Esta acción eliminará permanentemente todos los registros de la sala <strong>${sala}</strong>.
+                        </div>
+                        <p>¿Estás seguro de que quieres continuar?</p>
+                        <div class="text-muted">
+                            <strong>Registros a eliminar:</strong> ${registros} de la sala ${sala}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-warning" id="confirmDeleteSala">
+                            <i class="fas fa-trash me-2"></i>Eliminar Sala
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modal);
+    const modalElement = new bootstrap.Modal(document.getElementById('confirmSalaModal'));
+    modalElement.show();
+    
+    // Manejar confirmación
+    document.getElementById('confirmDeleteSala').addEventListener('click', function() {
+        fetch('/api/eliminar-por-sala', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sala: sala })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert(data.mensaje);
+                // Recargar la página para actualizar la información
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar registros: ' + error.message);
+        })
+        .finally(() => {
+            modalElement.hide();
+        });
+    });
+    
+    // Limpiar modal cuando se cierre
+    document.getElementById('confirmSalaModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+</script>
+
+</body>
+</html>

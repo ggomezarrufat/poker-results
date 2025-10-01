@@ -1,0 +1,161 @@
+🚀 Iniciando aplicación con Supabase...
+📡 Supabase URL: https://ovtromeyunbhgndqlncb.supabase.co
+🔑 Supabase Key: eyJhbGciOiJIUzI1NiIs...
+ * Serving Flask app 'app_supabase'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.0.18:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 219-563-565
+127.0.0.1 - - [24/Sep/2025 20:37:06] "[32mGET / HTTP/1.1[0m" 302 -
+ * Detected change in '/Users/gga/Proyectos/poker-results/app_supabase.py', reloading
+🚀 Iniciando aplicación con Supabase...
+📡 Supabase URL: https://ovtromeyunbhgndqlncb.supabase.co
+🔑 Supabase Key: eyJhbGciOiJIUzI1NiIs...
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 219-563-565
+127.0.0.1 - - [24/Sep/2025 20:37:38] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/gga/Proyectos/poker-results/app_supabase.py", line 122, in login
+    return render_template('login.html', form=form)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 1301, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/gga/Proyectos/poker-results/templates/login.html", line 126, in top-level template code
+    {{ form.submit(class="btn btn-primary btn-login") }}
+    
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/utils.py", line 83, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: '__main__.LoginForm object' has no attribute 'submit'
+127.0.0.1 - - [24/Sep/2025 20:37:38] "[36mGET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:37:38] "[36mGET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:37:38] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:37:47] "[32mGET / HTTP/1.1[0m" 302 -
+127.0.0.1 - - [24/Sep/2025 20:37:47] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/gga/Proyectos/poker-results/app_supabase.py", line 122, in login
+    return render_template('login.html', form=form)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 1301, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/gga/Proyectos/poker-results/templates/login.html", line 126, in top-level template code
+    {{ form.submit(class="btn btn-primary btn-login") }}
+    
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/utils.py", line 83, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: '__main__.LoginForm object' has no attribute 'submit'
+127.0.0.1 - - [24/Sep/2025 20:37:47] "[36mGET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:37:47] "[36mGET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:37:47] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [24/Sep/2025 20:56:53] "[32mGET / HTTP/1.1[0m" 302 -
+127.0.0.1 - - [24/Sep/2025 20:56:54] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/gga/Proyectos/poker-results/app_supabase.py", line 122, in login
+    return render_template('login.html', form=form)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 1301, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/gga/Proyectos/poker-results/templates/login.html", line 126, in top-level template code
+    {{ form.submit(class="btn btn-primary btn-login") }}
+    
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jinja2/utils.py", line 83, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: '__main__.LoginForm object' has no attribute 'submit'
+127.0.0.1 - - [24/Sep/2025 20:56:54] "GET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2025 20:56:54] "GET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2025 20:56:54] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [24/Sep/2025 20:56:54] "GET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2025 20:56:54] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+ * Detected change in '/Users/gga/Proyectos/poker-results/app_supabase.py', reloading
+🚀 Iniciando aplicación con Supabase...
+📡 Supabase URL: https://ovtromeyunbhgndqlncb.supabase.co
+🔑 Supabase Key: eyJhbGciOiJIUzI1NiIs...
+Error cargando usuario: {'message': 'infinite recursion detected in policy for relation "users"', 'code': '42P17', 'hint': None, 'details': None}
+Error cargando usuario: {'message': 'infinite recursion detected in policy for relation "users"', 'code': '42P17', 'hint': None, 'details': None}
+Error cargando usuario: {'message': 'infinite recursion detected in policy for relation "users"', 'code': '42P17', 'hint': None, 'details': None}
+Error cargando usuario: {'message': 'infinite recursion detected in policy for relation "users"', 'code': '42P17', 'hint': None, 'details': None}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 219-563-565
+ * Detected change in '/Users/gga/Proyectos/poker-results/app_supabase.py', reloading
+🚀 Iniciando aplicación con Supabase...
+📡 Supabase URL: https://ovtromeyunbhgndqlncb.supabase.co
+🔑 Supabase Key: eyJhbGciOiJIUzI1NiIs...
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 219-563-565
+ * Detected change in '/Users/gga/Proyectos/poker-results/app_supabase.py', reloading
+🚀 Iniciando aplicación con Supabase...
+📡 Supabase URL: https://ovtromeyunbhgndqlncb.supabase.co
+🔑 Supabase Key: eyJhbGciOiJIUzI1NiIs...
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 219-563-565

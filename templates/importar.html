@@ -28,12 +28,24 @@
                     <div class="mb-3">
                         <label for="archivo" class="form-label">Archivo Excel</label>
                         <input type="file" class="form-control" id="archivo" name="archivo" 
-                               accept=".xlsx,.xls" required>
-                        <div class="form-text">Formatos soportados: .xlsx, .xls</div>
+                               accept=".xlsx,.xls,.html" required>
+                        <div class="form-text">Formatos soportados: .xlsx, .xls, .html</div>
+                    </div>
+                    
+                    <!-- Previsualización del archivo -->
+                    <div id="previsualizacion" style="display: none;" class="mb-3">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Previsualización del Archivo</h6>
+                            <div id="info-archivo"></div>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="btnImportar">
                         <i class="fas fa-upload me-2"></i>Importar Archivo
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-info ms-2" id="btnPrevisualizar">
+                        <i class="fas fa-eye me-2"></i>Previsualizar
                     </button>
                 </form>
             </div>
@@ -76,6 +88,93 @@
 
 {% block scripts %}
 <script>
+// Función para previsualizar el archivo
+document.getElementById('btnPrevisualizar').addEventListener('click', function() {
+    const archivo = document.getElementById('archivo').files[0];
+    const sala = document.getElementById('sala').value;
+    
+    if (!archivo) {
+        alert('Por favor selecciona un archivo primero');
+        return;
+    }
+    
+    if (!sala) {
+        alert('Por favor selecciona una sala primero');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+    formData.append('sala', sala);
+    
+    // Mostrar loading
+    const btnPrevisualizar = document.getElementById('btnPrevisualizar');
+    btnPrevisualizar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analizando...';
+    btnPrevisualizar.disabled = true;
+    
+    fetch('/api/previsualizar-archivo', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            mostrarPrevisualizacion(data);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al analizar el archivo');
+    })
+    .finally(() => {
+        btnPrevisualizar.innerHTML = '<i class="fas fa-eye me-2"></i>Previsualizar';
+        btnPrevisualizar.disabled = false;
+    });
+});
+
+// Función para mostrar la previsualización
+function mostrarPrevisualizacion(data) {
+    const previsualizacion = document.getElementById('previsualizacion');
+    const infoArchivo = document.getElementById('info-archivo');
+    
+    let columnasHTML = '';
+    if (data.columnas_detectadas && data.columnas_detectadas.length > 0) {
+        columnasHTML = `
+            <div class="mt-2">
+                <strong>Columnas detectadas:</strong>
+                <span class="badge bg-secondary ms-1">${data.columnas_detectadas.join(', ')}</span>
+            </div>
+        `;
+    }
+    
+    infoArchivo.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Archivo:</strong> ${data.nombre_archivo}<br>
+                <strong>Tipo:</strong> ${data.tipo_archivo}<br>
+                <strong>Sala:</strong> ${data.sala}
+            </div>
+            <div class="col-md-6">
+                <strong>Total de registros:</strong> ${data.total_registros}<br>
+                <strong>Registros válidos:</strong> ${data.registros_validos}<br>
+                ${data.registros_sin_fecha > 0 ? `<strong>Registros sin fecha:</strong> ${data.registros_sin_fecha}<br>` : ''}
+            </div>
+        </div>
+        ${columnasHTML}
+        <div class="mt-2">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Se importarán ${data.registros_validos} registros válidos.
+                ${data.registros_sin_fecha > 0 ? `${data.registros_sin_fecha} registros serán omitidos por falta de fecha.` : ''}
+            </small>
+        </div>
+    `;
+    
+    previsualizacion.style.display = 'block';
+}
+
 document.getElementById('importForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -83,88 +182,188 @@ document.getElementById('importForm').addEventListener('submit', function(e) {
     const btnImportar = document.getElementById('btnImportar');
     const resultadoDiv = document.getElementById('resultadoImportacion');
     
-    // Mostrar loading
+    // Mostrar loading con progreso
     btnImportar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
     btnImportar.disabled = true;
+    resultadoDiv.style.display = 'block';
+    resultadoDiv.innerHTML = `
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Preparando importación...
+            <div class="progress mt-2">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+            </div>
+            <div id="progreso-texto" class="mt-2">
+                <small class="text-muted">Iniciando procesamiento...</small>
+            </div>
+        </div>
+    `;
     
-    fetch('/api/importar', {
+    // Enviar datos del formulario usando fetch con streaming
+    fetch('/api/importar-progreso', {
         method: 'POST',
         body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            resultadoDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>${data.error}
-                </div>
-            `;
-        } else {
-            let duplicadosHTML = '';
-            if (data.duplicados_detalle && data.duplicados_detalle.length > 0) {
-                duplicadosHTML = `
-                    <div class="mt-3">
-                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Detalle de Duplicados Omitidos:</h6>
-                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                            <table class="table table-sm table-striped">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Hora</th>
-                                        <th>Tipo</th>
-                                        <th>Descripción</th>
-                                        <th>Importe</th>
-                                        <th>Categoría</th>
-                                        <th>Juego</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-                
-                data.duplicados_detalle.forEach(dup => {
-                    duplicadosHTML += `
-                        <tr>
-                            <td>${dup.fecha}</td>
-                            <td>${dup.hora || '-'}</td>
-                            <td>${dup.tipo_movimiento}</td>
-                            <td class="text-truncate" style="max-width: 200px;" title="${dup.descripcion}">${dup.descripcion}</td>
-                            <td class="${dup.importe >= 0 ? 'text-success' : 'text-danger'}">$${dup.importe.toFixed(2)}</td>
-                            <td>${dup.categoria}</td>
-                            <td>${dup.tipo_juego}</td>
-                        </tr>
-                    `;
-                });
-                
-                duplicadosHTML += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            resultadoDiv.innerHTML = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>${data.mensaje}
-                    <br><small>Registros importados: ${data.resultados_importados} | Duplicados omitidos: ${data.duplicados_encontrados}</small>
-                    ${duplicadosHTML}
-                </div>
-            `;
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
         }
-        resultadoDiv.style.display = 'block';
-    })
-    .catch(error => {
-        resultadoDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>Error al importar: ${error.message}
-            </div>
-        `;
-        resultadoDiv.style.display = 'block';
-    })
-    .finally(() => {
-        btnImportar.innerHTML = '<i class="fas fa-upload me-2"></i>Importar Archivo';
-        btnImportar.disabled = false;
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        function readStream() {
+            return reader.read().then(({ done, value }) => {
+                if (done) {
+                    return;
+                }
+                
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+                
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            actualizarProgreso(data);
+                        } catch (e) {
+                            console.error('Error parsing SSE data:', e, 'Line:', line);
+                        }
+                    }
+                }
+                
+                return readStream();
+            });
+        }
+        
+        readStream().catch(error => {
+            console.error('Error reading stream:', error);
+            mostrarError('Error al procesar el archivo');
+        });
+    }).catch(error => {
+        console.error('Error:', error);
+        mostrarError('Error al enviar el archivo');
     });
 });
+
+// Función para actualizar el progreso
+function actualizarProgreso(data) {
+    const progressBar = document.querySelector('.progress-bar');
+    const progresoTexto = document.getElementById('progreso-texto');
+    
+    if (data.tipo === 'inicio') {
+        progresoTexto.innerHTML = `<small class="text-muted">Total de registros encontrados: ${data.total_registros}. Iniciando procesamiento...</small>`;
+    } else if (data.tipo === 'progreso') {
+        const porcentaje = Math.round(data.porcentaje);
+        progressBar.style.width = porcentaje + '%';
+        progressBar.setAttribute('aria-valuenow', porcentaje);
+        progresoTexto.innerHTML = `<small class="text-muted">Procesando: ${data.procesados}/${data.total} registros (${porcentaje}%)</small>`;
+    } else if (data.tipo === 'lote_completado') {
+        const porcentaje = Math.round(data.porcentaje);
+        progressBar.style.width = porcentaje + '%';
+        progressBar.setAttribute('aria-valuenow', porcentaje);
+        progresoTexto.innerHTML = `<small class="text-success"><i class="fas fa-check-circle me-1"></i>Lote completado: ${data.procesados}/${data.total} registros importados (${porcentaje}%) - Lote de ${data.lote_size} registros</small>`;
+    } else if (data.tipo === 'completado') {
+        mostrarResultado(data);
+    } else if (data.tipo === 'duplicados_detalle') {
+        // Los detalles de duplicados llegan por separado
+        mostrarDetallesDuplicados(data);
+    } else if (data.error) {
+        mostrarError(data.error);
+    } else {
+        // Si no hay tipo específico, asumir que es el resultado final
+        console.log('Resultado sin tipo específico:', data);
+        mostrarResultado(data);
+    }
+}
+
+// Función para mostrar el resultado final
+function mostrarResultado(data) {
+    const resultadoDiv = document.getElementById('resultadoImportacion');
+    const btnImportar = document.getElementById('btnImportar');
+
+    // Si hay conteo de duplicados pero no detalles, mostrar mensaje informativo
+    let duplicadosInfo = '';
+    if (data.duplicados_detalle_count > 0) {
+        duplicadosInfo = `<br><small class="text-info">Se omitieron ${data.duplicados_detalle_count} registros duplicados. Los detalles se muestran abajo.</small>`;
+    }
+
+    resultadoDiv.innerHTML = `
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>${data.mensaje}
+            <br><small>Registros importados: ${data.resultados_importados} | Duplicados omitidos: ${data.duplicados_encontrados}</small>
+            ${duplicadosInfo}
+        </div>
+    `;
+
+    // Restaurar botón
+    btnImportar.innerHTML = '<i class="fas fa-upload me-2"></i>Importar Archivo';
+    btnImportar.disabled = false;
+}
+
+// Nueva función para mostrar detalles de duplicados por separado
+function mostrarDetallesDuplicados(data) {
+    const resultadoDiv = document.getElementById('resultadoImportacion');
+
+    if (data.duplicados_detalle && data.duplicados_detalle.length > 0) {
+        let duplicadosHTML = `
+            <div class="mt-3">
+                <h6><i class="fas fa-exclamation-triangle me-2"></i>${data.mensaje}</h6>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Importe</th>
+                                <th>Categoría</th>
+                                <th>Juego</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        data.duplicados_detalle.forEach(dup => {
+            duplicadosHTML += `
+                <tr>
+                    <td>${dup.fecha}</td>
+                    <td>${dup.hora || '-'}</td>
+                    <td>${dup.tipo_movimiento}</td>
+                    <td class="text-truncate" style="max-width: 200px;" title="${dup.descripcion}">${dup.descripcion}</td>
+                    <td class="${dup.importe >= 0 ? 'text-success' : 'text-danger'}">$${dup.importe.toFixed(2)}</td>
+                    <td>${dup.categoria}</td>
+                    <td>${dup.tipo_juego}</td>
+                </tr>
+            `;
+        });
+
+        duplicadosHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                ${data.total_duplicados > 100 ? `<small class="text-muted">Mostrando primeros 100 de ${data.total_duplicados} duplicados omitidos.</small>` : ''}
+            </div>
+        `;
+
+        // Agregar los detalles al resultado existente
+        resultadoDiv.innerHTML += duplicadosHTML;
+    }
+}
+
+// Función para mostrar errores
+function mostrarError(mensaje) {
+    const resultadoDiv = document.getElementById('resultadoImportacion');
+    const btnImportar = document.getElementById('btnImportar');
+    
+    resultadoDiv.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>${mensaje}
+        </div>
+    `;
+    
+    // Restaurar botón
+    btnImportar.innerHTML = '<i class="fas fa-upload me-2"></i>Importar Archivo';
+    btnImportar.disabled = false;
+}
 </script>
 {% endblock %}

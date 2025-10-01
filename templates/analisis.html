@@ -361,13 +361,20 @@ function cargarAnalisis() {
     fetch('/api/analisis/insights')
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                throw new Error(data.error);
+            if (!data.success) {
+                throw new Error(data.error || 'Error desconocido');
             }
             
             // Ocultar spinner y mostrar contenido
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('analisis-content').style.display = 'block';
+            
+            // Mostrar mensaje si no hay datos
+            if (data.message) {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-text').textContent = data.message;
+                return;
+            }
             
             // Procesar datos
             mostrarRecomendaciones(data.recomendaciones);

@@ -5,6 +5,7 @@
     <div class="col-12">
         <h2><i class="fas fa-chart-bar me-2"></i>Informes de Resultados</h2>
         <p class="text-muted">Analiza tus resultados económicos y estadísticas de juego.</p>
+        
     </div>
 </div>
 
@@ -44,6 +45,18 @@
                             <option value="2021">📅 2021</option>
                             <option value="2020">📅 2020</option>
                         </select>
+                    </div>
+                    
+                    <!-- Campo de búsqueda -->
+                    <div class="mb-3">
+                        <label for="busqueda" class="form-label">🔍 Buscar Registros</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="busqueda" name="busqueda" placeholder="Buscar en descripción, sala, tipo de movimiento...">
+                            <button class="btn btn-outline-secondary" type="button" onclick="limpiarBusqueda()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Busca en descripción, sala, tipo de movimiento y categoría</small>
                     </div>
                     
                     <div class="mb-3">
@@ -225,6 +238,36 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Controles de paginación -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span id="infoPaginacion" class="text-muted">Mostrando registros...</span>
+                    </div>
+                    <div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="btnAnterior" onclick="cambiarPagina(-1)" disabled>
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <span class="btn btn-outline-secondary btn-sm disabled" id="infoPagina">
+                                Página 1 de 1
+                            </span>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="btnSiguiente" onclick="cambiarPagina(1)" disabled>
+                                Siguiente <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Selector de registros por página -->
+                <div class="mt-2">
+                    <small class="text-muted">Registros por página: </small>
+                    <select class="form-select form-select-sm d-inline-block w-auto" id="perPageSelect" onchange="cambiarRegistrosPorPagina()">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -232,8 +275,15 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 let opcionesDisponibles = {};
+let paginaActual = 1;
+let registrosPorPagina = 50;
+let totalPaginas = 1;
+let busquedaActual = '';
 
 document.getElementById('filtrosForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -241,23 +291,30 @@ document.getElementById('filtrosForm').addEventListener('submit', function(e) {
 });
 
 function cargarOpciones() {
+    // Cargar todas las opciones con el endpoint principal
     fetch('/api/informes/opciones')
     .then(response => response.json())
     .then(data => {
-        opcionesDisponibles = data;
-        crearFiltrosMultiples();
+        if (data.success) {
+            opcionesDisponibles = data.opciones;
+            crearFiltrosMultiples();
+        } else {
+            console.error('Error en respuesta:', data.error);
+        }
     })
     .catch(error => {
         console.error('Error al cargar opciones:', error);
     });
 }
 
+
 function crearFiltrosMultiples() {
     // Crear filtros de categorías
     const categoriasDiv = document.getElementById('categorias-filtro');
     categoriasDiv.innerHTML = '';
     
-    opcionesDisponibles.categorias.forEach(categoria => {
+    if (opcionesDisponibles.categorias && Array.isArray(opcionesDisponibles.categorias)) {
+        opcionesDisponibles.categorias.forEach(categoria => {
         const div = document.createElement('div');
         div.className = 'form-check';
         div.innerHTML = `
@@ -268,13 +325,15 @@ function crearFiltrosMultiples() {
             </label>
         `;
         categoriasDiv.appendChild(div);
-    });
+        });
+    }
     
     // Crear filtros de tipos de juego
     const tiposJuegoDiv = document.getElementById('tipos-juego-filtro');
     tiposJuegoDiv.innerHTML = '';
     
-    opcionesDisponibles.tipos_juego.forEach(tipo => {
+    if (opcionesDisponibles.tipos_juego && Array.isArray(opcionesDisponibles.tipos_juego)) {
+        opcionesDisponibles.tipos_juego.forEach(tipo => {
         const div = document.createElement('div');
         div.className = 'form-check';
         div.innerHTML = `
@@ -285,13 +344,15 @@ function crearFiltrosMultiples() {
             </label>
         `;
         tiposJuegoDiv.appendChild(div);
-    });
+        });
+    }
     
     // Crear filtros de niveles de buy-in
     const nivelesBuyinDiv = document.getElementById('niveles-buyin-filtro');
     nivelesBuyinDiv.innerHTML = '';
     
-    opcionesDisponibles.niveles_buyin.forEach(nivel => {
+    if (opcionesDisponibles.niveles_buyin && Array.isArray(opcionesDisponibles.niveles_buyin)) {
+        opcionesDisponibles.niveles_buyin.forEach(nivel => {
         const div = document.createElement('div');
         div.className = 'form-check';
         div.innerHTML = `
@@ -302,13 +363,15 @@ function crearFiltrosMultiples() {
             </label>
         `;
         nivelesBuyinDiv.appendChild(div);
-    });
+        });
+    }
     
     // Crear filtros de salas
     const salasDiv = document.getElementById('salas-filtro');
     salasDiv.innerHTML = '';
     
-    opcionesDisponibles.salas.forEach(sala => {
+    if (opcionesDisponibles.salas && Array.isArray(opcionesDisponibles.salas)) {
+        opcionesDisponibles.salas.forEach(sala => {
         const div = document.createElement('div');
         div.className = 'form-check';
         div.innerHTML = `
@@ -319,17 +382,20 @@ function crearFiltrosMultiples() {
             </label>
         `;
         salasDiv.appendChild(div);
-    });
+        });
+    }
     
     // Actualizar opciones de tipo de movimiento
     const tipoMovimientoSelect = document.getElementById('tipo_movimiento');
     tipoMovimientoSelect.innerHTML = '<option value="">Todos</option>';
-    opcionesDisponibles.tipos_movimiento.forEach(tipo => {
+    if (opcionesDisponibles.tipos_movimiento && Array.isArray(opcionesDisponibles.tipos_movimiento)) {
+        opcionesDisponibles.tipos_movimiento.forEach(tipo => {
         const option = document.createElement('option');
         option.value = tipo;
         option.textContent = tipo;
         tipoMovimientoSelect.appendChild(option);
-    });
+        });
+    }
 }
 
 function cargarInformes() {
@@ -363,60 +429,98 @@ function cargarInformes() {
     fetch(`/api/informes/resultados?${params}`)
     .then(response => response.json())
     .then(data => {
-        // Actualizar estadísticas
-        document.getElementById('cantidad_torneos').textContent = 
-            data.estadisticas.cantidad_torneos;
-        document.getElementById('total_registros').textContent = 
-            data.estadisticas.total_registros;
-        
-        // Suma de importes
-        const sumaImportes = data.estadisticas.suma_importes;
-        const colorSuma = sumaImportes >= 0 ? 'text-success' : 'text-danger';
-        document.getElementById('suma_importes').textContent = 
-            '$' + sumaImportes.toFixed(2);
-        document.getElementById('suma_importes').className = 
-            colorSuma + ' mb-0';
-        
-        // Nuevas estadísticas
-        document.getElementById('total_invertido').textContent = 
-            '$' + data.estadisticas.total_invertido.toFixed(2);
-        document.getElementById('total_ganancias').textContent = 
-            '$' + data.estadisticas.total_ganancias.toFixed(2);
-        
-        // ROI calculado correctamente
-        document.getElementById('roi').textContent = 
-            data.estadisticas.roi.toFixed(1) + '%';
-        
-        // Resultado económico
-        const resultadoEconomico = data.estadisticas.resultado_economico;
-        const colorResultado = resultadoEconomico >= 0 ? 'text-success' : 'text-danger';
-        document.getElementById('resultado_economico').textContent = 
-            '$' + resultadoEconomico.toFixed(2);
-        document.getElementById('resultado_economico').className = 
-            colorResultado;
-        
-        // Generar gráfico de resultados diarios cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => {
-                    generarGraficoResultadosDiarios(data.resultados_diarios);
-                }, 1000);
+        console.log('📊 DEBUG - Datos recibidos del backend:', data);
+        if (data.success && data.resultados) {
+            console.log('📊 DEBUG - Estadísticas en data.resultados:', {
+                torneos_jugados: data.resultados.torneos_jugados,
+                total_invertido: data.resultados.total_invertido,
+                total_ganancias: data.resultados.total_ganancias,
+                roi: data.resultados.roi,
+                resultado_economico: data.resultados.resultado_economico
             });
+            
+            // Actualizar estadísticas correctamente
+            document.getElementById('cantidad_torneos').textContent = 
+                data.resultados.torneos_jugados || 0;
+            document.getElementById('total_registros').textContent = 
+                data.resultados.total_registros || 0;
+            
+            // Total invertido (importes negativos como positivos)
+            document.getElementById('total_invertido').textContent = 
+                '$' + (data.resultados.total_invertido || 0).toFixed(2);
+            
+            // Total ganancias (importes positivos)
+            document.getElementById('total_ganancias').textContent = 
+                '$' + (data.resultados.total_ganancias || 0).toFixed(2);
+            
+            // ROI calculado en el backend
+            document.getElementById('roi').textContent = 
+                (data.resultados.roi || 0).toFixed(1) + '%';
+            
+            // Suma de importes (balance total)
+            const sumaImportes = data.resultados.total_importe || 0;
+            const colorSuma = sumaImportes >= 0 ? 'text-success' : 'text-danger';
+            document.getElementById('suma_importes').textContent = 
+                '$' + sumaImportes.toFixed(2);
+            document.getElementById('suma_importes').className = 
+                colorSuma + ' mb-0';
+            
+            // Resultado económico (ganancias - inversión)
+            const resultadoEconomico = data.resultados.resultado_economico || 0;
+            const colorResultado = resultadoEconomico >= 0 ? 'text-success' : 'text-danger';
+            document.getElementById('resultado_economico').textContent = 
+                '$' + resultadoEconomico.toFixed(2);
+            document.getElementById('resultado_economico').className = 
+                colorResultado + ' mb-1';
+            
+            // Obtener datos para el gráfico de últimos 10 días
+            obtenerDatosGrafico().then(resultadosDiarios => {
+                // Generar gráfico de resultados diarios cuando el DOM esté listo
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        setTimeout(() => {
+                            generarGraficoResultadosDiarios(resultadosDiarios);
+                        }, 1000);
+                    });
+                } else {
+                    setTimeout(() => {
+                        generarGraficoResultadosDiarios(resultadosDiarios);
+                    }, 1000);
+                }
+            });
+            
+            // Almacenar datos globalmente para ordenamiento
+            window.datosResultados = data.resultados.registros || [];
+            
+            // Actualizar tabla usando la función de ordenamiento
+            actualizarTablaResultados();
         } else {
-            setTimeout(() => {
-                generarGraficoResultadosDiarios(data.resultados_diarios);
-            }, 1000);
+            console.error('Error en respuesta:', data.error || 'Respuesta inválida');
+            
+            // Limpiar datos en caso de error
+            document.getElementById('cantidad_torneos').textContent = '0';
+            document.getElementById('total_registros').textContent = '0';
+            document.getElementById('suma_importes').textContent = '$0.00';
+            document.getElementById('total_invertido').textContent = '$0.00';
+            document.getElementById('total_ganancias').textContent = '$0.00';
+            document.getElementById('roi').textContent = '0.0%';
+            document.getElementById('resultado_economico').textContent = '$0.00';
+            
+            // Limpiar gráfico y tabla
+            window.datosResultados = [];
+            actualizarTablaResultados();
+            
+            // Mostrar mensaje de error al usuario
+            let mensajeError = data.error || 'Error desconocido';
+            if (mensajeError.includes('Resource temporarily unavailable') || mensajeError.includes('ReadError')) {
+                mensajeError = 'Error de conexión con la base de datos. Por favor, intenta nuevamente en unos momentos.';
+            }
+            alert('Error al cargar los informes: ' + mensajeError);
         }
-        
-        // Almacenar datos globalmente para ordenamiento
-        datosResultados = data.resultados;
-        
-        // Actualizar tabla usando la función de ordenamiento
-        actualizarTablaResultados();
     })
     .catch(error => {
         console.error('Error al cargar informes:', error);
-        alert('Error al cargar los informes');
+        alert('Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.');
     });
 }
 
@@ -532,9 +636,28 @@ function deseleccionarTodos(name) {
     checkboxes.forEach(cb => cb.checked = false);
 }
 
+// Función para obtener datos del gráfico de últimos 10 días
+function obtenerDatosGrafico() {
+    return fetch('/api/informes/ultimos-10-dias')
+        .then(response => response.json())
+        .then(graficoData => {
+            console.log('📊 Datos del gráfico recibidos:', graficoData);
+            if (graficoData.resultados_diarios) {
+                return graficoData.resultados_diarios;
+            } else {
+                console.warn('No se encontraron datos de resultados_diarios en la respuesta del gráfico');
+                return [];
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener datos del gráfico:', error);
+            return [];
+        });
+}
+
 // Función para generar el gráfico de resultados diarios
 function generarGraficoResultadosDiarios(resultadosDiarios) {
-    console.log('Intentando generar gráfico...', resultadosDiarios);
+    console.log('Intentando generar gráfico con datos procesados...', resultadosDiarios);
     
     const ctx = document.getElementById('graficoResultadosDiarios');
     
@@ -563,13 +686,32 @@ function generarGraficoResultadosDiarios(resultadosDiarios) {
         window.graficoResultadosDiarios.destroy();
     }
     
-    // Preparar datos
+    // Verificar que tenemos datos válidos ya procesados desde el backend
+    if (!resultadosDiarios || !Array.isArray(resultadosDiarios) || resultadosDiarios.length === 0) {
+        console.warn('No hay datos válidos para generar el gráfico - usando datos vacíos para los últimos 10 días');
+        
+        // Crear datos vacíos para los últimos 10 días si no hay datos
+        const hoy = new Date();
+        resultadosDiarios = [];
+        for (let i = 9; i >= 0; i--) {
+            const fecha = new Date(hoy);
+            fecha.setDate(fecha.getDate() - i);
+            resultadosDiarios.push({
+                fecha: fecha.toISOString().split('T')[0],
+                resultado: 0,
+                movimientos: 0
+            });
+        }
+    }
+    
+    // Los datos ya vienen procesados del backend con los últimos 10 días
+    // Preparar datos para el gráfico
     const fechas = resultadosDiarios.map(d => {
         const fecha = new Date(d.fecha);
         return fecha.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
     });
     
-    const resultados = resultadosDiarios.map(d => d.resultado);
+    const resultados = resultadosDiarios.map(d => d.resultado || 0);
     const colores = resultados.map(r => r >= 0 ? '#28a745' : '#dc3545');
     
     // Crear gráfico con manejo de errores
@@ -603,7 +745,7 @@ function generarGraficoResultadosDiarios(resultadosDiarios) {
                         callbacks: {
                             label: function(context) {
                                 const valor = context.parsed.y;
-                                const movimientos = resultadosDiarios[context.dataIndex].movimientos;
+                                const movimientos = resultadosDiarios[context.dataIndex].movimientos || 0;
                                 return `$${valor.toFixed(2)} (${movimientos} movimientos)`;
                             }
                         }
@@ -634,12 +776,16 @@ function generarGraficoResultadosDiarios(resultadosDiarios) {
 }
 
 // Variables globales para ordenamiento
-let datosResultados = [];
 let ordenActual = { columna: null, direccion: 'asc' };
 
 // Función para ordenar los datos
 function ordenarDatos(columna, direccion) {
-    datosResultados.sort((a, b) => {
+    if (!window.datosResultados || !Array.isArray(window.datosResultados)) {
+        console.error('❌ No hay datos para ordenar');
+        return;
+    }
+    
+    window.datosResultados.sort((a, b) => {
         let valorA = a[columna];
         let valorB = b[columna];
         
@@ -682,35 +828,65 @@ function ordenarDatos(columna, direccion) {
 
 // Función para actualizar la tabla con los datos ordenados
 function actualizarTablaResultados() {
+    console.log('🔄 Actualizando tabla de resultados...');
+    
     const tbody = document.querySelector('#tablaResultados tbody');
+    if (!tbody) {
+        console.error('❌ No se encontró el tbody de la tabla');
+        return;
+    }
+    
     tbody.innerHTML = '';
     
-    datosResultados.forEach(resultado => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${resultado.fecha}</td>
-            <td>${resultado.hora || '-'}</td>
-            <td>${resultado.tipo_movimiento}</td>
-            <td>${resultado.descripcion}</td>
-            <td class="${resultado.importe >= 0 ? 'text-success' : 'text-danger'}">
-                $${resultado.importe.toFixed(2)}
-            </td>
-            <td>${resultado.categoria}</td>
-            <td>${resultado.tipo_juego}</td>
-            <td>${resultado.nivel_buyin || '-'}</td>
-            <td>${resultado.sala}</td>
-        `;
-        tbody.appendChild(row);
+    if (!window.datosResultados || !Array.isArray(window.datosResultados)) {
+        console.error('❌ datosResultados no es un array válido:', window.datosResultados);
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No hay datos para mostrar</td></tr>';
+        return;
+    }
+    
+    console.log('📊 Procesando', window.datosResultados.length, 'registros para la tabla');
+    
+    if (window.datosResultados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No se encontraron registros</td></tr>';
+        return;
+    }
+    
+    window.datosResultados.forEach((resultado, index) => {
+        try {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${resultado.fecha || '-'}</td>
+                <td>${resultado.hora || '-'}</td>
+                <td>${resultado.tipo_movimiento || '-'}</td>
+                <td title="${resultado.descripcion || ''}">${(resultado.descripcion || '').substring(0, 50)}${(resultado.descripcion || '').length > 50 ? '...' : ''}</td>
+                <td class="${resultado.importe >= 0 ? 'text-success' : 'text-danger'}">
+                    $${parseFloat(resultado.importe || 0).toFixed(2)}
+                </td>
+                <td>${resultado.categoria || '-'}</td>
+                <td>${resultado.tipo_juego || '-'}</td>
+                <td>${resultado.nivel_buyin || '-'}</td>
+                <td>${resultado.sala || '-'}</td>
+            `;
+            tbody.appendChild(row);
+        } catch (e) {
+            console.error('❌ Error procesando registro', index, ':', e, resultado);
+        }
     });
+    
+    console.log('✅ Tabla actualizada con', window.datosResultados.length, 'registros');
 }
 
 // Función para manejar el clic en los headers
 function manejarOrdenamiento(columna) {
+    console.log('🔄 Ordenando por columna:', columna);
+    
     // Determinar la dirección del ordenamiento
     let direccion = 'asc';
     if (ordenActual.columna === columna && ordenActual.direccion === 'asc') {
         direccion = 'desc';
     }
+    
+    console.log('📊 Dirección de ordenamiento:', direccion);
     
     // Actualizar el estado del ordenamiento
     ordenActual.columna = columna;
@@ -745,6 +921,254 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 1000);
 });
+
+// Funciones de paginación y búsqueda
+function cambiarPagina(direccion) {
+    const nuevaPagina = paginaActual + direccion;
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+        paginaActual = nuevaPagina;
+        cargarInformes();
+    }
+}
+
+function cambiarRegistrosPorPagina() {
+    registrosPorPagina = parseInt(document.getElementById('perPageSelect').value);
+    paginaActual = 1; // Resetear a la primera página
+    cargarInformes();
+}
+
+function limpiarBusqueda() {
+    document.getElementById('busqueda').value = '';
+    busquedaActual = '';
+    paginaActual = 1;
+    cargarInformes();
+}
+
+function actualizarControlesPaginacion(data) {
+    // Nota: La paginación se maneja en el frontend por simplicidad
+    // El servidor devuelve todos los datos filtrados, el frontend los pagina
+
+    // Actualizar información de registros si está disponible
+    if (data.estadisticas && data.estadisticas.total_registros !== undefined) {
+        const totalRegistros = data.estadisticas.total_registros;
+        const registrosMostrados = Math.min((data.resultados || []).length, registrosPorPagina);
+
+        if (totalRegistros > registrosPorPagina) {
+            const inicio = ((paginaActual - 1) * registrosPorPagina) + 1;
+            const fin = Math.min(paginaActual * registrosPorPagina, totalRegistros);
+            document.getElementById('infoPagina').textContent = `Mostrando ${inicio}-${fin} de ${totalRegistros} registros`;
+        } else {
+            document.getElementById('infoPagina').textContent = `Mostrando ${totalRegistros} registros`;
+        }
+    }
+}
+
+// Event listener para búsqueda en tiempo real
+document.getElementById('busqueda').addEventListener('input', function(e) {
+    clearTimeout(window.busquedaTimeout);
+    window.busquedaTimeout = setTimeout(() => {
+        busquedaActual = e.target.value.trim();
+        paginaActual = 1; // Resetear a la primera página
+        cargarInformes();
+    }, 500); // Debounce de 500ms
+});
+
+// Modificar la función cargarInformes para incluir paginación y búsqueda
+function cargarInformes() {
+    const formData = new FormData(document.getElementById('filtrosForm'));
+    const params = new URLSearchParams();
+    
+    // Agregar todos los filtros
+    for (const [key, value] of formData.entries()) {
+        if (value) {
+            if (Array.isArray(value)) {
+                value.forEach(v => params.append(key, v));
+            } else {
+                params.append(key, value);
+            }
+        }
+    }
+    
+    // Agregar parámetros de paginación y búsqueda
+    params.append('page', paginaActual);
+    params.append('per_page', registrosPorPagina);
+    if (busquedaActual) {
+        params.append('busqueda', busquedaActual);
+    }
+    
+    fetch(`/api/informes/resultados?${params.toString()}`)
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text.substring(0, 200)}...`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('📊 DEBUG - Datos recibidos del backend:', data);
+
+        // Verificar estructura de respuesta
+        if (!data || typeof data !== 'object') {
+            throw new Error('Respuesta inválida del servidor');
+        }
+
+        // Extraer estadísticas (pueden estar en data.estadisticas)
+        let estadisticas = data.estadisticas || {};
+
+        console.log('📊 DEBUG - Estadísticas extraídas:', estadisticas);
+
+        // Actualizar estadísticas correctamente
+        document.getElementById('cantidad_torneos').textContent =
+            estadisticas.cantidad_torneos || 0;
+        document.getElementById('total_registros').textContent =
+            estadisticas.total_registros || 0;
+
+        // Total invertido (importes negativos como positivos)
+        document.getElementById('total_invertido').textContent =
+            '$' + (estadisticas.total_invertido || 0).toFixed(2);
+
+        // Total ganancias (importes positivos)
+        document.getElementById('total_ganancias').textContent =
+            '$' + (estadisticas.total_ganancias || 0).toFixed(2);
+
+        // ROI calculado en el backend
+        document.getElementById('roi').textContent =
+            (estadisticas.roi || 0).toFixed(2) + '%';
+
+        // Suma de importes (balance total)
+        const sumaImportes = estadisticas.suma_importes || 0;
+        const colorSuma = sumaImportes >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('suma_importes').textContent =
+            '$' + sumaImportes.toFixed(2);
+        document.getElementById('suma_importes').className =
+            colorSuma + ' mb-0';
+
+        // Resultado económico (ganancias - inversión)
+        const resultadoEconomico = estadisticas.resultado_economico || 0;
+        const colorResultado = resultadoEconomico >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('resultado_economico').textContent =
+            '$' + resultadoEconomico.toFixed(2);
+        document.getElementById('resultado_economico').className =
+            colorResultado + ' mb-1';
+            
+            // Actualizar tabla
+            console.log('📊 Datos recibidos:', (data.resultados || []).length, 'registros');
+            window.datosResultados = data.resultados || [];
+            actualizarTablaResultados();
+            
+            // Actualizar controles de paginación
+            actualizarControlesPaginacion(data);
+            
+            // Obtener datos para el gráfico de últimos 10 días
+            obtenerDatosGrafico().then(resultadosDiarios => {
+                generarGraficoResultadosDiarios(resultadosDiarios);
+            });
+        } else {
+            console.error('Error en respuesta:', data.error || 'Respuesta inválida');
+            
+            // Limpiar datos en caso de error
+            document.getElementById('cantidad_torneos').textContent = '0';
+            document.getElementById('total_registros').textContent = '0';
+            document.getElementById('suma_importes').textContent = '$0.00';
+            document.getElementById('total_invertido').textContent = '$0.00';
+            document.getElementById('total_ganancias').textContent = '$0.00';
+            document.getElementById('roi').textContent = '0.0%';
+            document.getElementById('resultado_economico').textContent = '$0.00';
+            
+            // Mostrar mensaje de error más amigable
+            const estadisticasEl = document.getElementById('estadisticas');
+            const tablaEl = document.getElementById('tablaResultados');
+            const graficoEl = document.getElementById('graficoContainer');
+            
+            if (estadisticasEl) estadisticasEl.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Error al cargar estadísticas</div>';
+            if (tablaEl) tablaEl.innerHTML = '<tbody><tr><td colspan="9" class="text-center"><div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Error al cargar datos</div></td></tr></tbody>';
+            if (graficoEl) graficoEl.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Error al cargar gráfico</div>';
+            
+            // Mostrar mensaje de error específico
+            let mensajeError = data.error || 'Error desconocido';
+            
+            // Verificar si es un error de conexión
+            if (mensajeError.includes('conexión') || mensajeError.includes('Resource temporarily unavailable') || mensajeError.includes('ReadError')) {
+                // Mostrar mensaje con opción de reintento
+                mostrarErrorConReintento(mensajeError);
+            } else {
+                alert('Error al cargar los informes: ' + mensajeError);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar informes:', error);
+        
+        // Mostrar mensaje de error de conexión con reintento
+        if (error.message.includes('Failed to fetch') || error.message.includes('ERR_EMPTY_RESPONSE')) {
+            mostrarErrorConReintento('Error de conexión con el servidor. Intenta nuevamente en unos momentos.');
+        } else {
+            alert('Error de conexión: ' + error.message);
+        }
+    });
+}
+
+function mostrarErrorConReintento(mensaje) {
+    // Crear modal de error con reintento
+    const modalHtml = `
+        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title" id="errorModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Error de Conexión
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>${mensaje}</p>
+                        <p class="mb-0"><small class="text-muted">¿Deseas intentar cargar los datos nuevamente?</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="reintentar()">
+                            <i class="fas fa-sync-alt me-1"></i>Reintentar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Eliminar modal anterior si existe
+    const existingModal = document.getElementById('errorModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Agregar modal al body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+}
+
+function reintentar() {
+    // Cerrar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('errorModal'));
+    if (modal) modal.hide();
+    
+    // Mostrar indicador de carga
+    const estadisticasEl = document.getElementById('estadisticas');
+    const tablaEl = document.getElementById('tablaResultados');
+    const graficoEl = document.getElementById('graficoContainer');
+    
+    if (estadisticasEl) estadisticasEl.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Cargando estadísticas...</div>';
+    if (tablaEl) tablaEl.innerHTML = '<tbody><tr><td colspan="9" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Cargando datos...</td></tr></tbody>';
+    if (graficoEl) graficoEl.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Cargando gráfico...</div>';
+    
+    // Reintentar carga después de un pequeño delay
+    setTimeout(() => {
+        cargarInformes();
+    }, 1000);
+}
 
 // Cargar opciones y informes al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
