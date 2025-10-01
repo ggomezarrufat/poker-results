@@ -428,7 +428,53 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
         duplicados_detalle = []
         registros_nuevos = []
         
-        # Procesar todos los registros primero
+        # Obtener TODOS los registros existentes para comparación directa
+        print("🔍 Obteniendo TODOS los registros existentes para detección de duplicados...")
+        try:
+            # Obtener todos los registros en lotes para evitar límites de Supabase
+            all_records = []
+            offset = 0
+            limit = 1000
+            
+            while True:
+                batch = supabase.table('poker_results').select(
+                    'fecha', 'hora', 'descripcion', 'importe', 'sala', 'tipo_movimiento', 'categoria'
+                ).eq('user_id', str(user_id)).range(offset, offset + limit - 1).execute()
+                
+                if not batch.data:
+                    break
+                    
+                all_records.extend(batch.data)
+                offset += limit
+                
+                if len(batch.data) < limit:
+                    break
+            
+            # Crear un conjunto de registros existentes para comparación rápida
+            registros_existentes = set()
+            for record in all_records:
+                registro_key = (
+                    record['fecha'],
+                    record['hora'],
+                    record['descripcion'],
+                    round(float(record['importe']), 2),
+                    record['sala'],
+                    record['tipo_movimiento'],
+                    record['categoria']
+                )
+                registros_existentes.add(registro_key)
+            
+            print(f"✅ {len(registros_existentes)} registros existentes encontrados para comparación")
+            if registros_existentes:
+                # Mostrar algunos registros existentes para debug
+                sample_registros = list(registros_existentes)[:2]
+                for i, reg in enumerate(sample_registros):
+                    print(f"🔍 Registro existente {i+1}: {reg[0]} {reg[1]} | {reg[2][:30]}... | {reg[3]}")
+        except Exception as e:
+            print(f"❌ Error obteniendo registros existentes: {e}")
+            registros_existentes = set()
+        
+        # Procesar todos los registros
         print("🔄 Procesando registros...")
         for index, row in df.iterrows():
             try:
@@ -440,6 +486,12 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                     # Enviar progreso al cliente si hay callback
                     if progress_callback:
                         progress_callback(f"data: {json.dumps({'tipo': 'progreso', 'procesados': index + 1, 'total': total_registros, 'porcentaje': porcentaje})}\n\n")
+                
+                # Variables para hash (valores originales antes de límites)
+                hash_fecha = None
+                hash_hora = None
+                hash_descripcion = None
+                hash_importe_original = None
                 
                 if sala == 'PokerStars':
                     # Formato PokerStars: Transaction Details, Individual Transaction Amounts, Running Balance
@@ -456,10 +508,14 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                         fecha_hora = pd.to_datetime(fecha_str)
                         fecha = fecha_hora.date()
                         hora = fecha_hora.time()
+                        hash_fecha = fecha.isoformat()
+                        hash_hora = hora.isoformat() if hora else None
                     except:
                         # Si no se puede parsear la fecha, usar fecha actual
                         fecha = datetime.now().date()
                         hora = datetime.now().time()
+                        hash_fecha = fecha.isoformat()
+                        hash_hora = hora.isoformat() if hora else None
                     
                     # Extraer importe del texto con límite seguro
                     importe = 0.0
@@ -470,12 +526,19 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                         elif 'Tournament Won' in descripcion or 'Tournament Interim Payout' in descripcion:
                             importe = float(importe_str) if importe_str.replace('.', '').replace('-', '').isdigit() else 0
                         
+                        # Guardar importe original para hash
+                        hash_importe_original = importe
+                        
                         # Limitar importe a rango seguro para Supabase (precision 10, scale 2 = max 99,999,999.99)
                         if abs(importe) > 99999999.99:
                             importe = 99999999.99 if importe > 0 else -99999999.99
                             print(f"⚠️  Importe limitado: {importe}")
                     except (ValueError, TypeError):
                         importe = 0.0
+                        hash_importe_original = 0.0
+                    
+                    # Guardar descripción para hash
+                    hash_descripcion = descripcion
                     
                     # Categorizar
                     categoria = 'Torneo'
@@ -501,6 +564,12 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                     payment_method = str(row['Payment Method'])
                     descripcion = str(row['Description'])
                     
+                    # Guardar valores originales para hash
+                    hash_fecha = fecha.isoformat()
+                    hash_hora = hora.isoformat() if hora else None
+                    hash_descripcion = f"{payment_method}|{descripcion}"
+                    hash_importe_original = money_in - money_out
+                    
                     importe = money_in - money_out
                     # Limitar importe a rango seguro para Supabase (precision 10, scale 2 = max 99,999,999.99)
                     if abs(importe) > 99999999.99:
@@ -522,8 +591,19 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                         categoria = 'Transferencia'
                         tipo_movimiento = 'Transfer'
                 
-                # Generar hash para detectar duplicados
-                hash_data = f"{fecha.isoformat()}{hora.isoformat()}{descripcion}{importe}{sala}"
+                # Crear clave de registro para comparación directa (más robusta que hash)
+                registro_key = (
+                    fecha.isoformat(),
+                    hora.isoformat() if hora else None,
+                    descripcion,
+                    round(importe, 2),
+                    sala,
+                    tipo_movimiento,
+                    categoria
+                )
+                
+                # Generar hash para almacenamiento (usar clave simplificada)
+                hash_data = "|".join([str(x) for x in registro_key])
                 hash_duplicado = hashlib.md5(hash_data.encode()).hexdigest()
                 
                 # Calcular nivel de buy-in SOLO para registros Buy In
@@ -540,7 +620,27 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                     else:
                         nivel_buyin = 'Very High'
                 
-                # Crear registro para Supabase
+                # Verificar si es duplicado usando comparación directa (más robusta)
+                if registro_key in registros_existentes:
+                    duplicados_encontrados += 1
+                    duplicados_detalle.append({
+                        'fecha': fecha.isoformat(),
+                        'hora': hora.isoformat() if hora else None,
+                        'tipo_movimiento': tipo_movimiento,
+                        'descripcion': descripcion,
+                        'importe': round(importe, 2),
+                        'categoria': categoria,
+                        'tipo_juego': 'Torneo'
+                    })
+                    if duplicados_encontrados <= 3:  # Mostrar algunos duplicados para debug
+                        print(f"🔄 Duplicado detectado: {fecha} {descripcion[:30]}... | {round(importe, 2)}")
+                    continue  # Saltar este registro, es duplicado
+                else:
+                    # Mostrar algunos registros nuevos para debug
+                    if len(registros_nuevos) < 3:
+                        print(f"🆕 Registro nuevo {len(registros_nuevos)+1}: {fecha} {descripcion[:30]}... | {round(importe, 2)}")
+                
+                # Crear registro para Supabase solo si NO es duplicado
                 registro = {
                     'id': str(uuid.uuid4()),
                     'user_id': str(user_id),
@@ -563,38 +663,10 @@ def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
                 print(f"❌ Error procesando fila {index}: {e}")
                 continue
         
-        print(f"✅ Procesamiento completado. {len(registros_nuevos)} registros preparados")
+        print(f"✅ Procesamiento completado. {len(registros_nuevos)} registros nuevos, {duplicados_encontrados} duplicados omitidos")
         
-        # Verificar duplicados en lote
-        print("🔍 Verificando duplicados...")
-        hashes_existentes = set()
-        if registros_nuevos:
-            # Obtener todos los hashes existentes de una vez
-            try:
-                existing_hashes = supabase.table('poker_results').select('hash_duplicado').eq('user_id', str(user_id)).execute()
-                hashes_existentes = set([record['hash_duplicado'] for record in existing_hashes.data])
-                print(f"✅ {len(hashes_existentes)} hashes existentes encontrados")
-            except Exception as e:
-                print(f"❌ Error obteniendo hashes existentes: {e}")
-        
-        # Filtrar duplicados
-        registros_sin_duplicados = []
-        for registro in registros_nuevos:
-            if registro['hash_duplicado'] in hashes_existentes:
-                duplicados_encontrados += 1
-                duplicados_detalle.append({
-                    'fecha': registro['fecha'],
-                    'hora': registro['hora'],
-                    'tipo_movimiento': registro['tipo_movimiento'],
-                    'descripcion': registro['descripcion'],
-                    'importe': registro['importe'],
-                    'categoria': registro['categoria'],
-                    'tipo_juego': registro['tipo_juego']
-                })
-            else:
-                registros_sin_duplicados.append(registro)
-        
-        print(f"✅ {duplicados_encontrados} duplicados encontrados, {len(registros_sin_duplicados)} registros nuevos")
+        # Los registros en registros_nuevos ya son solo los nuevos (no duplicados)
+        registros_sin_duplicados = registros_nuevos
         
         # Insertar registros nuevos en lotes grandes
         if registros_sin_duplicados:
@@ -789,16 +861,82 @@ def api_importar_progreso():
 @app.route('/api/salas-disponibles', methods=['GET'])
 @login_required
 def api_salas_disponibles():
-    """Obtener salas disponibles para el usuario"""
+    """Obtener salas disponibles para el usuario con conteo de registros"""
     try:
-        salas = get_user_distinct_values(current_user.id, 'sala')
+        user_id = str(current_user.id)
+        print(f"🔍 API Salas Disponibles - Usuario: {user_id}")
+        
+        # Obtener salas únicas del usuario
+        salas = get_user_distinct_values(user_id, 'sala')
+        print(f"🔍 API Salas Disponibles - Salas encontradas: {salas}")
+        
+        # Contar registros por sala del usuario
+        salas_info = []
+        for sala in salas:
+            try:
+                count_result = supabase.table('poker_results').select('id', count='exact').eq('user_id', user_id).eq('sala', sala).execute()
+                count = count_result.count if count_result.count else 0
+                salas_info.append({
+                    'sala': sala,
+                    'registros': count
+                })
+                print(f"🔍 API Salas Disponibles - Sala {sala}: {count} registros")
+            except Exception as e:
+                print(f"❌ Error contando registros de sala {sala}: {e}")
+                # Agregar con count 0 en caso de error
+                salas_info.append({
+                    'sala': sala,
+                    'registros': 0
+                })
         
         return jsonify({
             'success': True,
-            'salas': salas
+            'salas': salas_info
         })
+        
     except Exception as e:
+        print(f"❌ Error en api_salas_disponibles: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/eliminar-por-sala', methods=['POST'])
+@login_required
+def api_eliminar_por_sala():
+    """Elimina registros de una sala específica del usuario actual"""
+    try:
+        data = request.get_json()
+        sala = data.get('sala')
+
+        if not sala:
+            return jsonify({'error': 'Sala no especificada'}), 400
+
+        user_id = str(current_user.id)
+        print(f"🗑️ Eliminando registros de sala '{sala}' para usuario {user_id}")
+
+        # Contar registros de la sala del usuario antes de eliminar
+        response = supabase.table('poker_results').select('id', count='exact').eq('user_id', user_id).eq('sala', sala).execute()
+        registros_sala = response.count if response.count else 0
+
+        if registros_sala == 0:
+            return jsonify({
+                'mensaje': f'No se encontraron registros de la sala {sala}',
+                'registros_eliminados': 0
+            })
+
+        # Eliminar registros de la sala del usuario
+        delete_response = supabase.table('poker_results').delete().eq('user_id', user_id).eq('sala', sala).execute()
+        registros_eliminados = len(delete_response.data) if delete_response.data else 0
+
+        print(f"✅ Eliminados {registros_eliminados} registros de la sala '{sala}'")
+
+        return jsonify({
+            'mensaje': f'Se eliminaron {registros_eliminados} registros de la sala {sala}',
+            'registros_eliminados': registros_eliminados,
+            'sala': sala
+        })
+
+    except Exception as e:
+        print(f"❌ Error eliminando registros de sala: {e}")
+        return jsonify({'error': f'Error al eliminar registros de la sala: {str(e)}'}), 500
 
 if __name__ == '__main__':
     print('🚀 Iniciando aplicación Poker Results...')
