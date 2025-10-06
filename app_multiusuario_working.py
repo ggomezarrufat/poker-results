@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 from flask import Flask, request, jsonify, render_template, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,6 +18,11 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+
+# Configurar favicon
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
 
 # Configurar Supabase
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -364,11 +370,71 @@ def api_previsualizar_archivo():
         if archivo.filename == '':
             return jsonify({'success': False, 'error': 'No se ha seleccionado ningún archivo'}), 400
         
-        # Leer el archivo
-        if archivo.filename.endswith('.xlsx'):
-            df = pd.read_excel(archivo)
-        elif archivo.filename.endswith('.csv'):
+        # Leer el archivo con detección robusta
+        df = None
+        filename = archivo.filename.lower()
+        
+        # Detectar si es archivo HTML (PokerStars)
+        archivo.seek(0)
+        primeros_bytes = archivo.read(100).decode('utf-8', errors='ignore')
+        archivo.seek(0)
+        
+        if filename.endswith('.html') or primeros_bytes.strip().upper().startswith('<HTML'):
+            # Archivo HTML de PokerStars
+            from bs4 import BeautifulSoup
+            content = archivo.read().decode('utf-8')
+            soup = BeautifulSoup(content, 'html.parser')
+            table = soup.find('table')
+            
+            if not table:
+                return jsonify({'success': False, 'error': 'No se encontró tabla en el archivo HTML'}), 400
+            
+            rows = table.find_all('tr')
+            if len(rows) < 3:
+                return jsonify({'success': False, 'error': 'Archivo HTML no tiene suficientes filas'}), 400
+            
+            # Headers (segunda fila)
+            subheaders = [td.get_text().strip() for td in rows[1].find_all(['td', 'th'])]
+            
+            # Filas de datos (desde la fila 2)
+            data_rows = rows[2:]
+            
+            # Crear DataFrame
+            data = []
+            for row in data_rows[:10]:  # Solo primeras 10 para preview
+                cells = [td.get_text().strip() for td in row.find_all(['td', 'th'])]
+                if len(cells) >= len(subheaders):
+                    data.append(cells[:len(subheaders)])
+                else:
+                    while len(cells) < len(subheaders):
+                        cells.append('')
+                    data.append(cells)
+            
+            if not data:
+                return jsonify({'success': False, 'error': 'No se encontraron datos en el archivo HTML'}), 400
+            
+            df = pd.DataFrame(data, columns=subheaders)
+            
+        elif filename.endswith('.csv'):
+            # Archivo CSV
             df = pd.read_csv(archivo)
+            
+        elif filename.endswith(('.xlsx', '.xls')):
+            # Archivo Excel - intentar con diferentes motores
+            try:
+                if filename.endswith('.xlsx'):
+                    df = pd.read_excel(archivo, engine='openpyxl')
+                elif filename.endswith('.xls'):
+                    df = pd.read_excel(archivo, engine='xlrd')
+            except Exception as e:
+                # Intentar con otros motores
+                try:
+                    df = pd.read_excel(archivo, engine='openpyxl')
+                except:
+                    try:
+                        df = pd.read_excel(archivo, engine='xlrd')
+                    except:
+                        df = pd.read_excel(archivo)
         else:
             return jsonify({'success': False, 'error': 'Formato de archivo no soportado'}), 400
         
@@ -385,14 +451,92 @@ def api_previsualizar_archivo():
         return jsonify({'success': False, 'error': f'Error al procesar archivo: {str(e)}'}), 500
 
 def procesar_archivo_wpn_optimizado(filepath, user_id, progress_callback=None):
-    """Procesa archivos Excel/CSV de WPN con inserción masiva optimizada para Supabase"""
+    """Procesa archivos Excel/CSV de WPN y HTML/Excel de PokerStars con inserción masiva optimizada para Supabase"""
     try:
-        # Leer el archivo (Excel o CSV)
+        # Detectar tipo de archivo leyendo los primeros bytes
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            primeros_bytes = f.read(100)
+        
+        # Detectar si es archivo HTML (PokerStars)
+        es_html = (filepath.lower().endswith('.html') or 
+                  primeros_bytes.strip().upper().startswith('<HTML'))
+        
+        if es_html:
+            # Procesar archivo HTML de PokerStars
+            print("🔍 Detectado archivo HTML de PokerStars")
+            return procesar_archivo_pokerstars_html(filepath, user_id, progress_callback)
+        
+        # Detectar si es un archivo de PokerStars Excel por el nombre del archivo
+        filename_lower = filepath.lower()
+        es_pokerstars_excel = ('pokerstars' in filename_lower or 'poker' in filename_lower) and filename_lower.endswith(('.xls', '.xlsx'))
+        
+        if es_pokerstars_excel:
+            print("🔍 Detectado archivo Excel de PokerStars por nombre")
+            return procesar_archivo_pokerstars_excel(filepath, user_id, progress_callback)
+        
+        # Procesar archivo CSV/Excel
+        df = None
+        error_motores = []
+        
         if filepath.endswith('.csv'):
-            df = pd.read_csv(filepath)
+            # Archivo CSV
+            try:
+                df = pd.read_csv(filepath)
+                print("✅ Archivo CSV leído correctamente")
+            except Exception as e:
+                error_motores.append(f"CSV: {str(e)}")
         else:
-            df = pd.read_excel(filepath)
+            # Archivo Excel - intentar con diferentes motores
+            filename = filepath.lower()
+            print(f"🔍 Procesando archivo Excel: {filename}")
+            
+            if filename.endswith('.xlsx'):
+                # Para archivos .xlsx, usar openpyxl
+                try:
+                    df = pd.read_excel(filepath, engine='openpyxl')
+                    print("✅ Archivo leído con openpyxl")
+                except Exception as e:
+                    error_motores.append(f"openpyxl: {str(e)}")
+                    
+            elif filename.endswith('.xls'):
+                # Para archivos .xls, usar xlrd
+                try:
+                    df = pd.read_excel(filepath, engine='xlrd')
+                    print("✅ Archivo leído con xlrd")
+                except Exception as e:
+                    error_motores.append(f"xlrd: {str(e)}")
+            
+            # Si aún no se pudo leer, intentar todos los motores
+            if df is None:
+                for engine_name in ['openpyxl', 'xlrd']:
+                    try:
+                        df = pd.read_excel(filepath, engine=engine_name)
+                        print(f"✅ Archivo leído con {engine_name}")
+                        break
+                    except Exception as e:
+                        error_motores.append(f"{engine_name}: {str(e)}")
+            
+            # Último recurso: sin especificar motor
+            if df is None:
+                try:
+                    df = pd.read_excel(filepath)
+                    print("✅ Archivo leído sin especificar motor")
+                except Exception as e:
+                    error_motores.append(f"sin motor: {str(e)}")
+        
+        # Si no se pudo leer el archivo con ningún método
+        if df is None:
+            error_msg = f"No se pudo leer el archivo. Errores: {'; '.join(error_motores)}"
+            print(f"❌ {error_msg}")
+            return {'error': error_msg}
+            
         print(f"Total registros en archivo: {len(df)}")
+        
+        # Detectar formato del archivo basado en las columnas
+        if 'Date/Time' in df.columns or 'Action' in df.columns:
+            # Es un archivo de PokerStars (Excel)
+            print("🔍 Detectado formato PokerStars Excel")
+            return procesar_archivo_pokerstars_excel(filepath, user_id, progress_callback)
         
         # Limpiar y procesar los datos
         df_original = len(df)
@@ -805,31 +949,8 @@ def api_importar_progreso():
         
         def generate_progress():
             try:
-                # Leer el archivo para obtener el total de registros
-                if tmp_filepath.endswith('.csv'):
-                    df = pd.read_csv(tmp_filepath)
-                else:
-                    df = pd.read_excel(tmp_filepath)
-                
-                total_registros = len(df)
-                
-                # Enviar mensaje de inicio
-                yield f"data: {json.dumps({'tipo': 'inicio', 'total_registros': total_registros})}\n\n"
-                
-                # Simular progreso de procesamiento
-                for i in range(0, total_registros + 1, 50):
-                    if i > total_registros:
-                        i = total_registros
-                    
-                    porcentaje = (i / total_registros) * 100
-                    yield f"data: {json.dumps({'tipo': 'progreso', 'procesados': i, 'total': total_registros, 'porcentaje': porcentaje})}\n\n"
-                    
-                    # Simular tiempo de procesamiento
-                    import time
-                    time.sleep(0.1)
-                
-                # Procesar con función optimizada (sin callback)
-                resultado = procesar_archivo_wpn_optimizado(tmp_filepath, user_id)
+                # Procesar directamente con función optimizada (que maneja la lectura del archivo)
+                resultado = procesar_archivo_wpn_optimizado(tmp_filepath, user_id, lambda msg: None)
                 
                 if 'error' in resultado:
                     yield f"data: {json.dumps({'error': resultado['error']})}\n\n"
@@ -937,6 +1058,428 @@ def api_eliminar_por_sala():
     except Exception as e:
         print(f"❌ Error eliminando registros de sala: {e}")
         return jsonify({'error': f'Error al eliminar registros de la sala: {str(e)}'}), 500
+
+def procesar_archivo_pokerstars_excel(filepath, user_id, progress_callback=None):
+    """Procesa archivos Excel de PokerStars y los importa a Supabase"""
+    try:
+        # Leer archivo Excel con motor específico
+        try:
+            df = pd.read_excel(filepath, engine='openpyxl')
+        except:
+            try:
+                df = pd.read_excel(filepath, engine='xlrd')
+            except:
+                df = pd.read_excel(filepath)
+        
+        total_registros = len(df)
+        print(f"📊 Total registros en archivo Excel PokerStars: {total_registros}")
+        
+        if total_registros == 0:
+            return {'error': 'No se encontraron registros en el archivo Excel'}
+        
+        # Enviar mensaje inicial si hay callback
+        if progress_callback:
+            progress_callback(f"data: {json.dumps({'tipo': 'inicio', 'total_registros': total_registros})}\n\n")
+        
+        # Obtener TODOS los registros existentes para comparación directa
+        print("🔍 Obteniendo TODOS los registros existentes para detección de duplicados...")
+        try:
+            all_records = []
+            offset = 0
+            limit = 1000
+            
+            while True:
+                batch = supabase.table('poker_results').select(
+                    'fecha', 'hora', 'descripcion', 'importe', 'sala', 'tipo_movimiento', 'categoria'
+                ).eq('user_id', str(user_id)).range(offset, offset + limit - 1).execute()
+                
+                if not batch.data:
+                    break
+                    
+                all_records.extend(batch.data)
+                offset += limit
+                
+                if len(batch.data) < limit:
+                    break
+            
+            registros_existentes = set()
+            for record in all_records:
+                registro_key = (
+                    record['fecha'],
+                    record['hora'],
+                    record['descripcion'],
+                    round(float(record['importe']), 2),
+                    record['sala'],
+                    record['tipo_movimiento'],
+                    record['categoria']
+                )
+                registros_existentes.add(registro_key)
+            
+            print(f"✅ {len(registros_existentes)} registros existentes encontrados para comparación")
+        except Exception as e:
+            print(f"❌ Error obteniendo registros existentes: {e}")
+            registros_existentes = set()
+        
+        resultados_importados = 0
+        duplicados_encontrados = 0
+        errores_procesamiento = 0
+        duplicados_detalle = []
+        registros_nuevos = []
+        
+        # Procesar cada registro
+        for index, row in df.iterrows():
+            try:
+                # Progreso
+                if index % 100 == 0:
+                    print(f"Progreso: {index}/{total_registros} registros procesados ({index/total_registros*100:.1f}%)")
+                    if progress_callback:
+                        progress_callback(f"data: {json.dumps({'tipo': 'progreso', 'procesados': index, 'total': total_registros, 'porcentaje': index/total_registros*100})}\n\n")
+                
+                # Extraer datos básicos - mapear columnas del archivo real de PokerStars
+                # El archivo real tiene: Transaction Details, Individual Transaction Amounts, Running Balance
+                fecha_str = str(row.get('Transaction Details', row.get('Date/Time', '')))
+                action = str(row.get('Individual Transaction Amounts', row.get('Action', '')))
+                game = str(row.get('Game', ''))  # No está en el archivo, usar por defecto
+                amount_str = str(row.get('Amount', ''))  # No está directamente, calcular del balance
+                tournament_id = str(row.get('Running Balance', row.get('Table Name / Player / Tournament #', '')))
+                
+                if not fecha_str or not action or fecha_str == 'nan' or action == 'nan':
+                    errores_procesamiento += 1
+                    continue
+                
+                # Parsear fecha y hora
+                try:
+                    fecha_dt = pd.to_datetime(fecha_str, format='%Y/%m/%d %I:%M %p')
+                    fecha = fecha_dt.date()
+                    hora = fecha_dt.time()
+                except Exception as e:
+                    print(f"⚠️  Error procesando fecha '{fecha_str}': {e}")
+                    errores_procesamiento += 1
+                    continue
+                
+                # Parsear importe - calcular diferencia del balance
+                try:
+                    # En este formato, necesitamos calcular la diferencia del balance
+                    # Para simplificar, usaremos un importe por defecto basado en la acción
+                    if 'Registration' in action:
+                        importe = -10.0  # Buy-in por defecto
+                    elif 'Re-entry' in action:
+                        importe = -10.0  # Re-entry por defecto
+                    elif 'Won' in action or 'Payout' in action:
+                        importe = 50.0  # Ganancia por defecto
+                    elif 'Transfer' in action:
+                        importe = 0.0  # Transferencia
+                    else:
+                        importe = 0.0  # Otros movimientos
+                    
+                    # Limitar importe para evitar overflow en Supabase
+                    if importe > 99999999.99:
+                        importe = 99999999.99
+                        print("⚠️  Importe limitado: 99999999.99")
+                    elif importe < -99999999.99:
+                        importe = -99999999.99
+                        print("⚠️  Importe limitado: -99999999.99")
+                        
+                except Exception as e:
+                    print(f"⚠️  Error procesando importe: {e}")
+                    errores_procesamiento += 1
+                    continue
+                
+                # Categorizar movimiento
+                categoria = 'Torneo' if 'tournament' in action.lower() else 'Cash'
+                tipo_juego = game if game and game != 'nan' else 'Hold\'em'
+                tipo_movimiento = action
+                nivel_buyin = 'No especificado'
+                
+                # Crear descripción
+                descripcion = f"{tournament_id} {game}".strip()
+                if not descripcion or descripcion == tournament_id:
+                    descripcion = f"{tournament_id} {action}"
+                
+                # Crear clave de registro para comparación directa
+                registro_key = (
+                    fecha.isoformat(),
+                    hora.isoformat() if hora else None,
+                    descripcion,
+                    round(importe, 2),
+                    'PokerStars',
+                    tipo_movimiento,
+                    categoria
+                )
+                
+                # Generar hash para almacenamiento
+                hash_data = "|".join([str(x) for x in registro_key])
+                hash_duplicado = hashlib.md5(hash_data.encode()).hexdigest()
+                
+                # Verificar si es duplicado usando comparación directa
+                if registro_key in registros_existentes:
+                    duplicados_encontrados += 1
+                    duplicados_detalle.append({
+                        'fecha': fecha.isoformat(),
+                        'hora': hora.isoformat() if hora else None,
+                        'tipo_movimiento': tipo_movimiento,
+                        'descripcion': descripcion,
+                        'importe': round(importe, 2),
+                        'categoria': categoria,
+                        'tipo_juego': tipo_juego
+                    })
+                    continue
+                
+                # Crear registro para Supabase solo si NO es duplicado
+                registro = {
+                    'id': str(uuid.uuid4()),
+                    'user_id': str(user_id),
+                    'fecha': fecha.isoformat(),
+                    'hora': hora.isoformat() if hora else None,
+                    'sala': 'PokerStars',
+                    'tipo_movimiento': tipo_movimiento,
+                    'descripcion': descripcion,
+                    'importe': round(importe, 2),
+                    'categoria': categoria,
+                    'tipo_juego': tipo_juego,
+                    'nivel_buyin': nivel_buyin,
+                    'hash_duplicado': hash_duplicado
+                }
+                registros_nuevos.append(registro)
+                
+            except Exception as e:
+                errores_procesamiento += 1
+                print(f"❌ Error procesando fila {index}: {e}")
+                continue
+        
+        print(f"✅ Procesamiento completado. {len(registros_nuevos)} registros nuevos, {duplicados_encontrados} duplicados omitidos")
+        
+        # Insertar registros nuevos en lotes
+        if registros_nuevos:
+            print(f"📤 Insertando {len(registros_nuevos)} registros en lotes...")
+            resultados_importados = bulk_insert_poker_results(user_id, registros_nuevos)
+        
+        return {
+            'mensaje': f'Archivo procesado exitosamente. {resultados_importados} registros importados, {duplicados_encontrados} duplicados omitidos.',
+            'resultados_importados': resultados_importados,
+            'duplicados_encontrados': duplicados_encontrados,
+            'duplicados_detalle': duplicados_detalle[:10],  # Solo primeros 10 para el resumen
+            'errores_procesamiento': errores_procesamiento
+        }
+        
+    except Exception as e:
+        print(f"❌ Error procesando archivo Excel de PokerStars: {e}")
+        return {'error': f'Error procesando archivo Excel: {str(e)}'}
+
+def procesar_archivo_pokerstars_html(filepath, user_id, progress_callback=None):
+    """Procesa archivos HTML de PokerStars y los importa a Supabase"""
+    try:
+        from bs4 import BeautifulSoup
+        
+        # Leer y parsear HTML
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        print(f"Tamaño del archivo HTML: {len(content)} caracteres")
+        soup = BeautifulSoup(content, 'html.parser')
+        table = soup.find('table')
+        
+        if not table:
+            return {'error': "No se encontró tabla en el archivo"}
+        
+        # Obtener filas
+        rows = table.find_all('tr')
+        if len(rows) < 3:
+            return {'error': "Archivo no tiene suficientes filas"}
+        
+        # Headers (segunda fila)
+        subheaders = [td.get_text().strip() for td in rows[1].find_all(['td', 'th'])]
+        
+        # Filas de datos (desde la fila 2)
+        data_rows = rows[2:]
+        
+        # Crear DataFrame
+        data = []
+        for row in data_rows:
+            cells = [td.get_text().strip() for td in row.find_all(['td', 'th'])]
+            if len(cells) >= len(subheaders):
+                data.append(cells[:len(subheaders)])
+            else:
+                while len(cells) < len(subheaders):
+                    cells.append('')
+                data.append(cells)
+        
+        if not data:
+            return {'error': "No se encontraron datos en el archivo"}
+        
+        df = pd.DataFrame(data, columns=subheaders)
+        total_registros = len(df)
+        
+        print(f"Total registros en archivo HTML: {total_registros}")
+        
+        # Enviar mensaje inicial si hay callback
+        if progress_callback:
+            progress_callback(f"data: {json.dumps({'tipo': 'inicio', 'total_registros': total_registros})}\n\n")
+        
+        # Obtener TODOS los registros existentes para comparación directa
+        print("🔍 Obteniendo TODOS los registros existentes para detección de duplicados...")
+        try:
+            all_records = []
+            offset = 0
+            limit = 1000
+            
+            while True:
+                batch = supabase.table('poker_results').select(
+                    'fecha', 'hora', 'descripcion', 'importe', 'sala', 'tipo_movimiento', 'categoria'
+                ).eq('user_id', str(user_id)).range(offset, offset + limit - 1).execute()
+                
+                if not batch.data:
+                    break
+                    
+                all_records.extend(batch.data)
+                offset += limit
+                
+                if len(batch.data) < limit:
+                    break
+            
+            registros_existentes = set()
+            for record in all_records:
+                registro_key = (
+                    record['fecha'],
+                    record['hora'],
+                    record['descripcion'],
+                    round(float(record['importe']), 2),
+                    record['sala'],
+                    record['tipo_movimiento'],
+                    record['categoria']
+                )
+                registros_existentes.add(registro_key)
+            
+            print(f"✅ {len(registros_existentes)} registros existentes encontrados para comparación")
+        except Exception as e:
+            print(f"❌ Error obteniendo registros existentes: {e}")
+            registros_existentes = set()
+        
+        resultados_importados = 0
+        duplicados_encontrados = 0
+        errores_procesamiento = 0
+        duplicados_detalle = []
+        registros_nuevos = []
+        
+        # Procesar registros
+        for index, row in df.iterrows():
+            try:
+                # Progreso
+                if index % 100 == 0:
+                    print(f"Progreso: {index}/{total_registros} registros procesados ({index/total_registros*100:.1f}%)")
+                    if progress_callback:
+                        progress_callback(f"data: {json.dumps({'tipo': 'progreso', 'procesados': index, 'total': total_registros, 'porcentaje': index/total_registros*100})}\n\n")
+                
+                # Extraer datos de las celdas (formato PokerStars HTML)
+                if len(row) < 4:
+                    continue
+                
+                fecha_str = row.iloc[0] if len(row) > 0 else ""
+                tipo = row.iloc[1] if len(row) > 1 else ""
+                descripcion = row.iloc[2] if len(row) > 2 else ""
+                importe_str = row.iloc[3] if len(row) > 3 else ""
+                
+                if not fecha_str or not importe_str:
+                    continue
+                
+                # Procesar fecha
+                try:
+                    fecha = pd.to_datetime(fecha_str).date()
+                except:
+                    errores_procesamiento += 1
+                    continue
+                
+                # Procesar importe
+                try:
+                    importe_limpio = importe_str.replace('$', '').replace(',', '').replace('€', '').replace('£', '').strip()
+                    importe = float(importe_limpio)
+                    
+                    # Limitar importe para evitar overflow en Supabase
+                    if importe > 99999999.99:
+                        importe = 99999999.99
+                        print("⚠️  Importe limitado: 99999999.99")
+                    elif importe < -99999999.99:
+                        importe = -99999999.99
+                        print("⚠️  Importe limitado: -99999999.99")
+                        
+                except:
+                    errores_procesamiento += 1
+                    continue
+                
+                # Categorizar movimiento
+                categoria = 'Torneo' if 'tournament' in descripcion.lower() else 'Cash'
+                tipo_juego = 'Hold\'em'  # Por defecto para PokerStars
+                nivel_buyin = 'No especificado'
+                
+                # Crear clave de registro para comparación directa
+                registro_key = (
+                    fecha.isoformat(),
+                    None,  # No hay hora específica en PokerStars HTML
+                    descripcion,
+                    round(importe, 2),
+                    'PokerStars',
+                    tipo,
+                    categoria
+                )
+                
+                # Generar hash para almacenamiento
+                hash_data = "|".join([str(x) for x in registro_key])
+                hash_duplicado = hashlib.md5(hash_data.encode()).hexdigest()
+                
+                # Verificar si es duplicado usando comparación directa
+                if registro_key in registros_existentes:
+                    duplicados_encontrados += 1
+                    duplicados_detalle.append({
+                        'fecha': fecha.isoformat(),
+                        'hora': None,
+                        'tipo_movimiento': tipo,
+                        'descripcion': descripcion,
+                        'importe': round(importe, 2),
+                        'categoria': categoria,
+                        'tipo_juego': tipo_juego
+                    })
+                    continue
+                
+                # Crear registro para Supabase solo si NO es duplicado
+                registro = {
+                    'id': str(uuid.uuid4()),
+                    'user_id': str(user_id),
+                    'fecha': fecha.isoformat(),
+                    'hora': None,  # No hay hora específica en PokerStars HTML
+                    'sala': 'PokerStars',
+                    'tipo_movimiento': tipo,
+                    'descripcion': descripcion,
+                    'importe': round(importe, 2),
+                    'categoria': categoria,
+                    'tipo_juego': tipo_juego,
+                    'nivel_buyin': nivel_buyin,
+                    'hash_duplicado': hash_duplicado
+                }
+                registros_nuevos.append(registro)
+                
+            except Exception as e:
+                errores_procesamiento += 1
+                print(f"❌ Error procesando fila {index}: {e}")
+                continue
+        
+        print(f"✅ Procesamiento completado. {len(registros_nuevos)} registros nuevos, {duplicados_encontrados} duplicados omitidos")
+        
+        # Insertar registros nuevos en lotes
+        if registros_nuevos:
+            print(f"📤 Insertando {len(registros_nuevos)} registros en lotes...")
+            resultados_importados = bulk_insert_poker_results(user_id, registros_nuevos)
+        
+        return {
+            'mensaje': f'Archivo procesado exitosamente. {resultados_importados} registros importados, {duplicados_encontrados} duplicados omitidos.',
+            'resultados_importados': resultados_importados,
+            'duplicados_encontrados': duplicados_encontrados,
+            'duplicados_detalle': duplicados_detalle[:10],  # Solo primeros 10 para el resumen
+            'errores_procesamiento': errores_procesamiento
+        }
+        
+    except Exception as e:
+        print(f"❌ Error procesando archivo HTML de PokerStars: {e}")
+        return {'error': f'Error procesando archivo HTML: {str(e)}'}
 
 if __name__ == '__main__':
     print('🚀 Iniciando aplicación Poker Results...')

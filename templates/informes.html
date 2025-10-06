@@ -855,17 +855,17 @@ function actualizarTablaResultados() {
         try {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${resultado.fecha || '-'}</td>
-                <td>${resultado.hora || '-'}</td>
-                <td>${resultado.tipo_movimiento || '-'}</td>
-                <td title="${resultado.descripcion || ''}">${(resultado.descripcion || '').substring(0, 50)}${(resultado.descripcion || '').length > 50 ? '...' : ''}</td>
+                <td>${(resultado.fecha || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td>${(resultado.hora || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td>${(resultado.tipo_movimiento || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td title="${(resultado.descripcion || '').replace(/"/g, '&quot;')}">${(resultado.descripcion || '').substring(0, 50).replace(/</g, '&lt;').replace(/>/g, '&gt;')}${(resultado.descripcion || '').length > 50 ? '...' : ''}</td>
                 <td class="${resultado.importe >= 0 ? 'text-success' : 'text-danger'}">
                     $${parseFloat(resultado.importe || 0).toFixed(2)}
                 </td>
-                <td>${resultado.categoria || '-'}</td>
-                <td>${resultado.tipo_juego || '-'}</td>
-                <td>${resultado.nivel_buyin || '-'}</td>
-                <td>${resultado.sala || '-'}</td>
+                <td>${(resultado.categoria || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td>${(resultado.tipo_juego || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td>${(resultado.nivel_buyin || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                <td>${(resultado.sala || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
             `;
             tbody.appendChild(row);
         } catch (e) {
@@ -1000,7 +1000,7 @@ function cargarInformes() {
     .then(response => {
         if (!response.ok) {
             return response.text().then(text => {
-                throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text.substring(0, 200)}...`);
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text.substring(0, 200).replace(/`/g, '\\`').replace(/\$/g, '\\$')}...`);
             });
         }
         return response.json();
@@ -1122,7 +1122,7 @@ function mostrarErrorConReintento(mensaje) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>${mensaje}</p>
+                        <p>${mensaje.replace(/`/g, '\\`').replace(/\$/g, '\\$')}</p>
                         <p class="mb-0"><small class="text-muted">¿Deseas intentar cargar los datos nuevamente?</small></p>
                     </div>
                     <div class="modal-footer">

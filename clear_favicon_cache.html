@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Cache del Favicon</title>
+</head>
+<body>
+    <h1>Cache del Favicon Limpiado</h1>
+    <p>Si no ves el favicon de la aplicación, sigue estos pasos:</p>
+    
+    <h2>Para Chrome/Edge:</h2>
+    <ol>
+        <li>Presiona <strong>Ctrl+Shift+R</strong> (Windows) o <strong>Cmd+Shift+R</strong> (Mac)</li>
+        <li>O ve a <strong>Configuración → Privacidad → Borrar datos de navegación</strong></li>
+        <li>Selecciona "Imágenes y archivos en caché" y borra</li>
+    </ol>
+    
+    <h2>Para Firefox:</h2>
+    <ol>
+        <li>Presiona <strong>Ctrl+F5</strong> (Windows) o <strong>Cmd+Shift+R</strong> (Mac)</li>
+        <li>O ve a <strong>Configuración → Privacidad → Borrar datos</strong></li>
+    </ol>
+    
+    <h2>Verificación:</h2>
+    <p>El favicon debería aparecer en:</p>
+    <ul>
+        <li>La pestaña del navegador</li>
+        <li>Los marcadores/favoritos</li>
+        <li>El historial del navegador</li>
+    </ul>
+    
+    <p><strong>Nota:</strong> Los favicons pueden tardar unos segundos en aparecer después de limpiar el cache.</p>
+    
+    <script>
+        // Forzar recarga del favicon
+        const favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        favicon.type = 'image/x-icon';
+        favicon.href = '/static/favicon.ico?v=' + Date.now();
+        document.head.appendChild(favicon);
+        
+        console.log('Favicon forzado a recargar con timestamp:', Date.now());
+    </script>
+</body>
+</html>
+
